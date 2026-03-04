@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analysis</title>
+
+<style>
+body{
+display:flex;
+height:100vh;
+margin:0;
+font-family:Segoe UI;
+background:#f4f7f9;
+}
+
+.sidebar{
+width:230px;
+background:#0A4F7C;
+color:white;
+padding:20px;
+display:flex;
+flex-direction:column;
+}
+
+.menu a{
+text-decoration:none;
+color:white;
+padding:12px;
+border-radius:8px;
+margin-bottom:10px;
+display:block;
+}
+
+.menu a:hover{
+background:#04B5AF;
+}
+
+.main{
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.card{
+background:white;
+padding:30px;
+border-radius:16px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+width:420px;
+}
+
+input{
+width:100%;
+padding:10px;
+margin-bottom:15px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#04B5AF;
+border:none;
+border-radius:8px;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#0A4F7C;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<div class="menu">
+<a href="dashboard.html">Dashboard</a>
+<a href="learn.html">Learn</a>
+<a href="analysis.html">Analysis</a>
+<a href="profile.html">Profile</a>
+</div>
+</div>
+
+<div class="main">
+<div class="card">
+
+<h3>Your Career Information</h3>
+
+<input id="age" type="number" placeholder="Age">
+<input id="position" type="text" placeholder="Current Position">
+<input id="industry" type="text" placeholder="Industry">
+<input id="interest1" type="text" placeholder="Interest 1">
+<input id="interest2" type="text" placeholder="Interest 2">
+
+<button onclick="saveData()">Save</button>
+
+</div>
+</div>
+
+<script>
+
+function saveData(){
+
+let age=document.getElementById("age").value
+let position=document.getElementById("position").value
+let industry=document.getElementById("industry").value
+let i1=document.getElementById("interest1").value
+let i2=document.getElementById("interest2").value
+
+localStorage.setItem("age",age)
+localStorage.setItem("position",position)
+localStorage.setItem("industry",industry)
+localStorage.setItem("interest1",i1)
+localStorage.setItem("interest2",i2)
+
+alert("Information saved!")
+
+}
+
+window.onload=function(){
+
+document.getElementById("age").value=localStorage.getItem("age") || ""
+document.getElementById("position").value=localStorage.getItem("position") || ""
+document.getElementById("industry").value=localStorage.getItem("industry") || ""
+document.getElementById("interest1").value=localStorage.getItem("interest1") || ""
+document.getElementById("interest2").value=localStorage.getItem("interest2") || ""
+
+}
+
+</script>
+
+</body>
+</html>
