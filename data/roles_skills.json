@@ -1,0 +1,37 @@
+{
+  "Data Analyst": {
+    "description": "Analyses data to generate business insights",
+    "required_skills": {
+      "Python": 3, "SQL": 4, "Excel": 4,
+      "Statistics": 3, "Power BI": 3, "Data Visualization": 3
+    }
+  },
+  "Data Scientist": {
+    "description": "Builds ML models and drives data strategy",
+    "required_skills": {
+      "Python": 5, "SQL": 3, "Machine Learning": 4,
+      "Statistics": 5, "Deep Learning": 3, "Power BI": 2
+    }
+  },
+  "Software Engineer": {
+    "description": "Develops and maintains software systems",
+    "required_skills": {
+      "Python": 4, "Java": 4, "SQL": 3,
+      "System Design": 4, "Git": 4, "REST APIs": 4
+    }
+  },
+  "DevOps Engineer": {
+    "description": "Manages infrastructure, CI/CD, and deployments",
+    "required_skills": {
+      "Linux": 4, "Docker": 4, "Kubernetes": 3,
+      "CI/CD": 4, "Python": 3, "Git": 5
+    }
+  },
+  "IT Project Manager": {
+    "description": "Leads technical projects and cross-functional teams",
+    "required_skills": {
+      "Project Management": 5, "Agile": 4, "Risk Management": 4,
+      "Stakeholder Communication": 5, "Budgeting": 3, "SQL": 2
+    }
+  }
+}

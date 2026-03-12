@@ -1,0 +1,92 @@
+[
+  {
+    "id": "C001",
+    "title": "Machine Learning Specialization",
+    "provider": "Coursera – Andrew Ng",
+    "url": "https://www.coursera.org/specializations/machine-learning-introduction",
+    "skills_covered": ["Machine Learning", "Python", "Statistics"],
+    "level": "Intermediate",
+    "duration": "3 months"
+  },
+  {
+    "id": "C002",
+    "title": "Deep Learning Specialization",
+    "provider": "Coursera – DeepLearning.AI",
+    "url": "https://www.coursera.org/specializations/deep-learning",
+    "skills_covered": ["Deep Learning", "Python", "Machine Learning"],
+    "level": "Advanced",
+    "duration": "4 months"
+  },
+  {
+    "id": "C003",
+    "title": "Docker and Kubernetes: The Complete Guide",
+    "provider": "Udemy – Stephen Grider",
+    "url": "https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide",
+    "skills_covered": ["Docker", "Kubernetes", "CI/CD"],
+    "level": "Intermediate",
+    "duration": "6 weeks"
+  },
+  {
+    "id": "C004",
+    "title": "Linux Command Line Basics",
+    "provider": "Coursera – UC Davis",
+    "url": "https://www.coursera.org/learn/unix",
+    "skills_covered": ["Linux"],
+    "level": "Beginner",
+    "duration": "2 weeks"
+  },
+  {
+    "id": "C005",
+    "title": "Statistics for Data Science with Python",
+    "provider": "Coursera – IBM",
+    "url": "https://www.coursera.org/learn/statistics-for-data-science-python",
+    "skills_covered": ["Statistics", "Python"],
+    "level": "Intermediate",
+    "duration": "5 weeks"
+  },
+  {
+    "id": "C006",
+    "title": "Google Project Management Certificate",
+    "provider": "Coursera – Google",
+    "url": "https://www.coursera.org/professional-certificates/google-project-management",
+    "skills_covered": ["Project Management", "Agile", "Risk Management", "Stakeholder Communication"],
+    "level": "Beginner",
+    "duration": "6 months"
+  },
+  {
+    "id": "C007",
+    "title": "DevOps Beginners to Advanced with Projects",
+    "provider": "Udemy",
+    "url": "https://www.udemy.com/course/decodingdevops",
+    "skills_covered": ["CI/CD", "Linux", "Docker", "Git"],
+    "level": "Intermediate",
+    "duration": "8 weeks"
+  },
+  {
+    "id": "C008",
+    "title": "Git & GitHub Bootcamp",
+    "provider": "Udemy – Colt Steele",
+    "url": "https://www.udemy.com/course/git-and-github-bootcamp",
+    "skills_covered": ["Git"],
+    "level": "Beginner",
+    "duration": "2 weeks"
+  },
+  {
+    "id": "C009",
+    "title": "Power BI Desktop for Business Intelligence",
+    "provider": "Udemy – Maven Analytics",
+    "url": "https://www.udemy.com/course/microsoft-power-bi-up-running-with-power-bi-desktop",
+    "skills_covered": ["Power BI", "Data Visualization"],
+    "level": "Intermediate",
+    "duration": "3 weeks"
+  },
+  {
+    "id": "C010",
+    "title": "Agile Project Management",
+    "provider": "Coursera – Google",
+    "url": "https://www.coursera.org/learn/agile-project-management",
+    "skills_covered": ["Agile", "Project Management"],
+    "level": "Beginner",
+    "duration": "4 weeks"
+  }
+]
