@@ -1,0 +1,35 @@
+[
+  {
+    "id": "E001",
+    "name": "Ahmad Razif",
+    "current_role": "Data Analyst",
+    "target_role": "Data Scientist",
+    "years_experience": 2,
+    "current_skills": {
+      "Python": 3, "SQL": 4, "Excel": 4,
+      "Statistics": 2, "Machine Learning": 1, "Power BI": 3
+    }
+  },
+  {
+    "id": "E002",
+    "name": "Nurul Hana",
+    "current_role": "Software Engineer",
+    "target_role": "DevOps Engineer",
+    "years_experience": 3,
+    "current_skills": {
+      "Python": 4, "Java": 3, "Git": 3,
+      "Docker": 1, "Linux": 2, "SQL": 3
+    }
+  },
+  {
+    "id": "E003",
+    "name": "Haziq Farhan",
+    "current_role": "Data Analyst",
+    "target_role": "IT Project Manager",
+    "years_experience": 4,
+    "current_skills": {
+      "SQL": 4, "Excel": 4, "Power BI": 3,
+      "Project Management": 2, "Agile": 1, "Stakeholder Communication": 2
+    }
+  }
+]
