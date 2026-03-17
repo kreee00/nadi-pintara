@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nadi Pintara — Course Catalogue</title>
+  <script>(function(){var t=localStorage.getItem('np-theme');var d=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(t===null&&d))document.documentElement.classList.add('dark');}());</script>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+
+<div id="top-progress"></div>
+<div id="toast-container"></div>
+
+<!-- ═══ NAVBAR ═══════════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-brand-icon">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2C9 2 4 5.5 4 10C4 12.76 6.24 15 9 15C11.76 15 14 12.76 14 10C14 5.5 9 2 9 2Z" fill="white" opacity="0.9"/>
+        <circle cx="9" cy="10" r="2.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="nav-brand-text"><span>nadi</span><span>pintara</span></div>
+  </div>
+
+  <div class="nav-links">
+    <a href="/dashboard"    class="nav-link">My Dashboard</a>
+    <a href="/courses-page" class="nav-link active">Course Catalogue</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="dark-toggle" id="darkToggle" title="Toggle dark mode">
+      <span class="dark-toggle-icon sun">☀</span>
+      <span class="dark-toggle-icon moon">☽</span>
+    </button>
+    <div class="nav-avatar" id="navAvatar">NP</div>
+    <a href="/login" onclick="localStorage.removeItem('nadipintara_employee_id')"
+       style="font-size:12px; color:var(--text-3); text-decoration:none; margin-left:4px;"
+       title="Switch user">↩</a>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ══════════════════════════════════════════════ -->
+<main class="page-wrapper">
+  <div class="container">
+
+    <!-- Page header -->
+    <div class="page-header fade-up">
+      <div class="page-title">Course Catalogue</div>
+      <div class="page-sub" id="courseCount">Loading courses...</div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar fade-up">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" id="searchInput"
+          placeholder="Search by title, skill or provider..." oninput="filterCourses()" />
+      </div>
+
+      <div class="filter-pills" id="filterPills">
+        <button class="filter-pill active" data-filter="all"       onclick="setFilter('all',this)">All</button>
+        <button class="filter-pill"        data-filter="Upstream"  onclick="setFilter('Upstream',this)">Upstream</button>
+        <button class="filter-pill"        data-filter="Downstream" onclick="setFilter('Downstream',this)">Downstream</button>
+        <button class="filter-pill"        data-filter="Technical Services & Engineering" onclick="setFilter('Technical Services & Engineering',this)">Technical</button>
+        <button class="filter-pill"        data-filter="Corporate & Business" onclick="setFilter('Corporate & Business',this)">Corporate</button>
+      </div>
+
+      <div class="sort-wrap">
+        <select class="sort-select" id="sortSelect" onchange="filterCourses()">
+          <option value="default">Sort: Default</option>
+          <option value="title">Title A–Z</option>
+          <option value="duration">Duration</option>
+          <option value="level">Level</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Courses grid -->
+    <div class="courses-grid" id="coursesGrid">
+      <!-- Skeleton placeholders while loading -->
+      ${[...Array(6)].fill(0).map(()=>`
+        <div class="card" style="overflow:hidden;">
+          <div class="skeleton" style="height:72px;border-radius:0;"></div>
+          <div style="padding:16px 18px;display:flex;flex-direction:column;gap:10px;">
+            <div class="skeleton skeleton-line" style="width:90%"></div>
+            <div class="skeleton skeleton-line" style="width:60%"></div>
+            <div class="skeleton skeleton-line" style="width:40%"></div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">No courses found</div>
+      <div class="empty-sub">Try a different search term or clear your filters.</div>
+      <button class="btn btn-primary" onclick="clearFilters()">Clear Filters</button>
+    </div>
+
+  </div>
+</main>
+
+<script src="/static/js/main.js"></script>
+<script>
+
+const LEVEL_ORDER = { 'Beginner': 1, 'Intermediate': 2, 'Advanced': 3 };
+const DEPT_BAND = {
+  'Upstream':                        { cls: 'band-upstream',   icon: '⚙️' },
+  'Downstream':                      { cls: 'band-downstream', icon: '🏭' },
+  'Technical Services & Engineering':{ cls: 'band-technical',  icon: '🔧' },
+  'Corporate & Business':            { cls: 'band-corporate',  icon: '📊' },
+};
+
+let allCourses = [];
+let activeFilter = 'all';
+
+/* ── Load courses from backend ──────────────────────────── */
+async function loadCourses() {
+  try {
+    const res = await fetch('/courses');
+    allCourses = await res.json();
+  } catch {
+    // Fallback: use hardcoded data if fetch fails (for static preview)
+    allCourses = FALLBACK_COURSES;
+  }
+  document.getElementById('courseCount').textContent =
+    `${allCourses.length} industry-specific O&G courses from leading providers`;
+  filterCourses();
+}
+
+function setFilter(filter, btn) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  filterCourses();
+}
+
+function clearFilters() {
+  activeFilter = 'all';
+  document.getElementById('searchInput').value = '';
+  document.querySelectorAll('.filter-pill').forEach((p,i) => {
+    p.classList.toggle('active', i === 0);
+  });
+  filterCourses();
+}
+
+function filterCourses() {
+  const query  = document.getElementById('searchInput').value.toLowerCase().trim();
+  const sort   = document.getElementById('sortSelect').value;
+
+  let filtered = allCourses.filter(c => {
+    const matchDept = activeFilter === 'all' ||
+      (c.relevance_tags || []).includes(activeFilter);
+    const matchSearch = !query ||
+      c.title.toLowerCase().includes(query) ||
+      (c.provider||'').toLowerCase().includes(query) ||
+      (c.skills_covered||[]).some(s => s.toLowerCase().includes(query));
+    return matchDept && matchSearch;
+  });
+
+  if (sort === 'title')    filtered.sort((a,b) => a.title.localeCompare(b.title));
+  if (sort === 'level')    filtered.sort((a,b) => (LEVEL_ORDER[a.level]||0) - (LEVEL_ORDER[b.level]||0));
+  if (sort === 'duration') filtered.sort((a,b) => a.duration.localeCompare(b.duration));
+
+  renderCourses(filtered);
+}
+
+function renderCourses(courses) {
+  const grid  = document.getElementById('coursesGrid');
+  const empty = document.getElementById('emptyState');
+
+  if (!courses.length) {
+    grid.innerHTML = '';
+    empty.classList.add('show');
+    return;
+  }
+
+  empty.classList.remove('show');
+  grid.innerHTML = courses.map(c => {
+    // Determine dept from first relevance_tag
+    const dept = (c.relevance_tags || [])[0] || 'Corporate & Business';
+    const band = DEPT_BAND[dept] || DEPT_BAND['Corporate & Business'];
+    const levelClass = { 'Beginner':'badge-level-beg','Intermediate':'badge-level-int','Advanced':'badge-level-adv' }[c.level] || 'badge-level-int';
+    const visibleSkills = (c.skills_covered||[]).slice(0,3);
+    const extraSkills   = (c.skills_covered||[]).length - 3;
+    const skillsHtml = visibleSkills.map(s=>`<span class="course-skill-tag">${s}</span>`).join('')
+      + (extraSkills > 0 ? `<span class="skill-more">+${extraSkills}</span>` : '');
+
+    return `
+      <div class="course-card fade-up" data-id="${c.id}">
+        <div class="course-card-band ${band.cls}">
+          <span class="band-dept">${dept}</span>
+          <span class="band-icon">${band.icon}</span>
+        </div>
+        <div class="course-card-body">
+          <div class="course-card-title">${c.title}</div>
+          <div class="course-card-provider">
+            ${c.provider}
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="opacity:0.5">
+              <path d="M2 8L8 2M8 2H4M8 2V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="course-card-badges">
+            <span class="badge ${levelClass}">${c.level}</span>
+            <span class="badge badge-duration">⏱ ${c.duration}</span>
+          </div>
+          <div class="course-skills">${skillsHtml}</div>
+        </div>
+        <div class="course-card-footer">
+          <button class="btn-view-details" onclick="toggleDetail('${c.id}')">View Details</button>
+        </div>
+        <div class="course-detail" id="detail_${c.id}">
+          <div class="detail-section-title">All Skills Covered</div>
+          <div class="detail-skills">
+            ${(c.skills_covered||[]).map(s=>`<span class="course-skill-tag">${s}</span>`).join('')}
+          </div>
+          <div class="detail-section-title">Provider</div>
+          <a href="${c.url||'#'}" target="_blank" class="detail-provider-link">
+            ${c.provider}
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <div style="margin-top:14px;">
+            <a href="${c.url||'#'}" target="_blank" class="btn btn-primary" style="display:inline-flex; font-size:13px; padding:8px 18px;">
+              Enroll Now →
+            </a>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Trigger fade-up
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.course-card.fade-up').forEach((el, i) => {
+      setTimeout(() => el.classList.add('visible'), i * 50);
+    });
+  });
+}
+
+function toggleDetail(id) {
+  const detail = document.getElementById('detail_' + id);
+  const isOpen = detail.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.course-detail.open').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.btn-view-details').forEach(b => b.textContent = 'View Details');
+  if (!isOpen) {
+    detail.classList.add('open');
+    detail.closest('.course-card').querySelector('.btn-view-details').textContent = 'Hide Details';
+  }
+}
+
+/* ── Fallback static data (if Flask not running) ─────────── */
+const FALLBACK_COURSES = [
+  {"id":"C001","title":"Reservoir Engineering: Advanced Simulation & Modeling","provider":"Petroskills","url":"https://www.petroskills.com/course/reservoir-simulation","skills_covered":["Reservoir Engineering","Python","Data Analytics"],"level":"Advanced","duration":"2 months","relevance_tags":["Upstream"]},
+  {"id":"C002","title":"Well Completion & Workover Operations","provider":"IHRDC","url":"https://www.ihrdc.com/well-completion","skills_covered":["Well Completion","Drilling Engineering","Fluid Mechanics"],"level":"Intermediate","duration":"6 weeks","relevance_tags":["Upstream"]},
+  {"id":"C003","title":"Subsea Production Systems Design","provider":"SPE","url":"https://www.spe.org/training/subsea-systems","skills_covered":["Subsea Engineering","Fluid Mechanics","Asset Integrity"],"level":"Advanced","duration":"3 months","relevance_tags":["Upstream","Technical Services & Engineering"]},
+  {"id":"C004","title":"Process Safety Management (PSM) for Engineers","provider":"Petroskills","url":"https://www.petroskills.com/course/psm-essentials","skills_covered":["Process Safety Management","Risk Assessment","HAZOP"],"level":"Intermediate","duration":"4 weeks","relevance_tags":["Upstream","Downstream","Technical Services & Engineering"]},
+  {"id":"C005","title":"Pipeline Integrity Management & Assessment","provider":"Petroskills","url":"https://www.petroskills.com/course/pipeline-integrity","skills_covered":["Pipeline Integrity","Asset Integrity","Regulatory Compliance"],"level":"Advanced","duration":"8 weeks","relevance_tags":["Upstream","Technical Services & Engineering"]},
+  {"id":"C006","title":"Refinery Process Optimization & Control","provider":"IHRDC","url":"https://www.ihrdc.com/refinery-optimization","skills_covered":["Refinery Process Control","Plant Operations","Data Analytics"],"level":"Advanced","duration":"10 weeks","relevance_tags":["Downstream"]},
+  {"id":"C007","title":"LNG Value Chain & Terminal Operations","provider":"SPE","url":"https://training.spe.org/lng-ops","skills_covered":["LNG Operations","Plant Operations","Regulatory Compliance"],"level":"Intermediate","duration":"5 weeks","relevance_tags":["Downstream"]},
+  {"id":"C008","title":"HAZOP Leader Training & Certification","provider":"Petroskills","url":"https://www.petroskills.com/hazop-lead","skills_covered":["HAZOP","Risk Assessment","Process Safety Management"],"level":"Advanced","duration":"2 weeks","relevance_tags":["Upstream","Downstream","Technical Services & Engineering"]},
+  {"id":"C009","title":"Data Science for Oil & Gas Professionals","provider":"Udemy","url":"https://www.udemy.com/course/data-science-og","skills_covered":["Data Analytics","Python","Machine Learning"],"level":"Intermediate","duration":"12 weeks","relevance_tags":["Upstream","Downstream","Corporate & Business"]},
+  {"id":"C010","title":"Project Management Professional (PMP) Prep","provider":"Coursera","url":"https://www.coursera.org/pmp-prep","skills_covered":["Project Management","Stakeholder Management","Risk Assessment"],"level":"Intermediate","duration":"6 months","relevance_tags":["Corporate & Business","Technical Services & Engineering"]},
+  {"id":"C011","title":"HSSE Compliance & Corporate Governance","provider":"LinkedIn Learning","url":"https://www.linkedin.com/learning/hsse-compliance","skills_covered":["HSSE Compliance","Regulatory Compliance","HSE Management"],"level":"Beginner","duration":"3 weeks","relevance_tags":["Corporate & Business","Upstream","Downstream"]},
+  {"id":"C012","title":"Strategic Stakeholder Management","provider":"Coursera","url":"https://www.coursera.org/stakeholder-strategy","skills_covered":["Stakeholder Management","Project Management","Crisis Management"],"level":"Advanced","duration":"4 weeks","relevance_tags":["Corporate & Business"]},
+  {"id":"C013","title":"Refining Turnaround & Maintenance Management","provider":"Petroskills","url":"https://www.petroskills.com/turnaround-mgmt","skills_covered":["Turnaround Management","Plant Operations","SAP ERP"],"level":"Advanced","duration":"6 weeks","relevance_tags":["Downstream"]},
+  {"id":"C014","title":"Asset Integrity Management Systems (AIMS)","provider":"IHRDC","url":"https://www.ihrdc.com/aims","skills_covered":["Asset Integrity","Risk Assessment","HSSE Compliance"],"level":"Intermediate","duration":"2 months","relevance_tags":["Technical Services & Engineering","Upstream","Downstream"]},
+  {"id":"C015","title":"Petroleum Geoscience & Formation Evaluation","provider":"SPE","url":"https://training.spe.org/geoscience","skills_covered":["Petroleum Geoscience","Reservoir Engineering","Data Analytics"],"level":"Intermediate","duration":"3 months","relevance_tags":["Upstream"]},
+  {"id":"C016","title":"Python for Engineers & Geoscientists","provider":"Udemy","url":"https://www.udemy.com/course/python-og-engineering","skills_covered":["Python","Data Analytics","Fluid Mechanics"],"level":"Beginner","duration":"8 weeks","relevance_tags":["Upstream","Technical Services & Engineering"]},
+  {"id":"C017","title":"Contract Management in Energy Capital Projects","provider":"LinkedIn Learning","url":"https://www.linkedin.com/learning/energy-contract-mgmt","skills_covered":["Contract Management","Project Management","Regulatory Compliance"],"level":"Advanced","duration":"5 weeks","relevance_tags":["Corporate & Business"]},
+  {"id":"C018","title":"SAP ERP for Plant Maintenance & Logistics","provider":"Udemy","url":"https://www.udemy.com/course/sap-pm-logistics","skills_covered":["SAP ERP","Plant Operations","Asset Integrity"],"level":"Intermediate","duration":"4 weeks","relevance_tags":["Downstream","Upstream"]},
+  {"id":"C019","title":"Strategic HSE Leadership & Management","provider":"OPITO","url":"https://www.opito.com/hse-leadership","skills_covered":["HSE Management","HSSE Compliance","Stakeholder Management"],"level":"Advanced","duration":"3 months","relevance_tags":["Corporate & Business"]},
+  {"id":"C020","title":"Incident Investigation & Root Cause Analysis","provider":"OPITO","url":"https://www.opito.com/root-cause-analysis","skills_covered":["Incident Investigation","Risk Assessment","HSE Management"],"level":"Advanced","duration":"4 weeks","relevance_tags":["Corporate & Business","Technical Services & Engineering"]},
+  {"id":"C021","title":"Crisis Management & Communication in Energy","provider":"edX","url":"https://www.edx.org/course/energy-crisis-mgmt","skills_covered":["Crisis Management","Stakeholder Management","HSE Management"],"level":"Advanced","duration":"6 weeks","relevance_tags":["Corporate & Business"]},
+  {"id":"C022","title":"Mastering Power BI for Energy Operations","provider":"Coursera","url":"https://www.coursera.org/energy-powerbi","skills_covered":["Power BI","Data Analytics","Data Visualization"],"level":"Intermediate","duration":"5 weeks","relevance_tags":["Upstream","Downstream","Corporate & Business"]},
+  {"id":"C023","title":"Machine Learning for Reservoir Prediction","provider":"Petroskills","url":"https://www.petroskills.com/course/ml-reservoir","skills_covered":["Machine Learning","Reservoir Engineering","Python"],"level":"Advanced","duration":"10 weeks","relevance_tags":["Upstream"]},
+  {"id":"C024","title":"Drilling & Well Construction Mastery","provider":"Petroskills","url":"https://www.petroskills.com/course/drilling-mastery","skills_covered":["Drilling Engineering","Well Completion","Process Safety Management"],"level":"Advanced","duration":"4 months","relevance_tags":["Upstream"]},
+  {"id":"C025","title":"Regulatory Compliance & Environmental Law (Malaysia)","provider":"UTP Executive Education","url":"https://www.utp.edu.my/exec-ed/environmental-law","skills_covered":["Regulatory Compliance","HSSE Compliance","Stakeholder Management"],"level":"Intermediate","duration":"4 weeks","relevance_tags":["Corporate & Business","Upstream","Downstream"]}
+];
+
+// Init
+loadCourses();
+
+// Show logged-in user initials
+(async () => {
+  const id = localStorage.getItem('nadipintara_employee_id');
+  if (!id) return;
+  try {
+    const res = await fetch(`/employee/${id}`);
+    const emp = await res.json();
+    const initials = emp.name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+    document.getElementById('navAvatar').textContent = initials;
+  } catch {}
+})();
+</script>
+</body>
+</html>

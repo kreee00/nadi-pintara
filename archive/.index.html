@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Nadi Pintara</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #04B5AF 0%, #0A4F7C 100%);
+            margin-left: 0; /* Reset sidebar margin for login */
+        }
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
+        }
+        .login-card .logo {
+            font-size: 32px;
+            color: var(--secondary);
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        select {
+            width: 100%;
+            padding: 14px;
+            border-radius: var(--radius);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            font-size: 16px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="card login-card">
+        <div class="logo">
+            <i class="fas fa-brain"></i> Nadi Pintara
+        </div>
+        <h3 style="margin-bottom: 10px;">Welcome Back</h3>
+        <p style="color: #64748b; margin-bottom: 30px;">Select your profile to continue</p>
+        
+        <select id="employeeSelect">
+            <option value="" disabled selected>Select Employee...</option>
+            <!-- Will be populated by JS -->
+        </select>
+
+        <button class="btn" style="width: 100%;" onclick="login()">Login</button>
+        
+        <div id="error" style="color: #ef4444; margin-top: 15px; display: none;">
+            Please select an employee profile.
+        </div>
+    </div>
+
+    <script>
+        // Fetch employees to populate dropdown
+        fetch('/employees')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById('employeeSelect');
+                data.forEach(emp => {
+                    const opt = document.createElement('option');
+                    opt.value = emp.id;
+                    opt.textContent = `${emp.name} (${emp.current_role})`;
+                    select.appendChild(opt);
+                });
+            });
+
+        function login() {
+            const empId = document.getElementById('employeeSelect').value;
+            if (empId) {
+                localStorage.setItem('employeeId', empId);
+                window.location.href = 'dashboard.html';
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

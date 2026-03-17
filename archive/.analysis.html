@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Analysis | Nadi Pintara</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><i class="fas fa-brain"></i> Nadi Pintara</div>
+        <div class="menu">
+            <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="analysis.html" class="active"><i class="fas fa-chart-radar"></i> Skill Analysis</a>
+            <a href="learn.html"><i class="fas fa-book-reader"></i> Learning Path</a>
+            <a href="profile.html"><i class="fas fa-user-circle"></i> Profile</a>
+            <a href="index.html" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="navbar">
+            <h2>Skill Gap Analysis</h2>
+            <div class="user-info">
+                <div class="user-avatar" id="avatarLetter">?</div>
+                <div id="userName">User</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Radar Chart Card -->
+            <div class="card" style="grid-column: span 2;">
+                <h3>Skill Visualizer</h3>
+                <div style="height: 400px; display: flex; justify-content: center;">
+                    <canvas id="skillChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Gaps List Card -->
+            <div class="card">
+                <h3>Top Skill Gaps</h3>
+                <table id="gapTable">
+                    <thead>
+                        <tr>
+                            <th>Skill</th>
+                            <th>Status</th>
+                            <th>Gap</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+                <div style="margin-top: 25px;">
+                    <button class="btn" style="width: 100%;" onclick="location.href='learn.html'">Generate Learning Path</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const empId = localStorage.getItem('employeeId');
+        
+        async function loadAnalysis() {
+            const [empRes, rolesRes] = await Promise.all([
+                fetch(`/employee/${empId}`),
+                fetch('/roles')
+            ]);
+            
+            const emp = await empRes.json();
+            const roles = await rolesRes.json();
+            
+            document.getElementById('userName').innerText = emp.name;
+            document.getElementById('avatarLetter').innerText = emp.name.charAt(0);
+            
+            const targetRole = emp.target_role;
+            const requiredSkills = roles[targetRole].required_skills;
+            const currentSkills = emp.current_skills;
+            
+            const labels = Object.keys(requiredSkills);
+            const currentData = labels.map(s => currentSkills[s] || 0);
+            const requiredData = labels.map(s => requiredSkills[s]);
+            
+            // Render Chart
+            const ctx = document.getElementById('skillChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Current Proficiency',
+                        data: currentData,
+                        fill: true,
+                        backgroundColor: 'rgba(4, 181, 175, 0.2)',
+                        borderColor: '#04B5AF',
+                        pointBackgroundColor: '#04B5AF',
+                    }, {
+                        label: 'Required for Target Role',
+                        data: requiredData,
+                        fill: true,
+                        backgroundColor: 'rgba(10, 79, 124, 0.1)',
+                        borderColor: '#0A4F7C',
+                        borderDash: [5, 5],
+                        pointBackgroundColor: '#0A4F7C',
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 5,
+                            ticks: { stepSize: 1 }
+                        }
+                    },
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // Render Gaps Table
+            const tbody = document.querySelector('#gapTable tbody');
+            labels.forEach(skill => {
+                const current = currentSkills[skill] || 0;
+                const required = requiredSkills[skill];
+                const gap = required - current;
+                
+                if (gap > 0) {
+                    const row = document.createElement('tr');
+                    const badgeClass = gap >= 2 ? 'badge-low' : 'badge-mid';
+                    row.innerHTML = `
+                        <td>${skill}</td>
+                        <td><span class="badge ${badgeClass}">${current}/${required}</span></td>
+                        <td>-${gap}</td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            });
+        }
+        
+        loadAnalysis();
+    </script>
+</body>
+</html>

@@ -2,7 +2,13 @@
 
 > **For UTP TTP Project** | Supervised by AP. Ts. Dr. Ahmad Sobri Bin Hashim
 
-This system recommends personalised online courses to employees based on their current skills and career goals — powered by a locally-running AI (no internet subscription needed).
+Nadi Pintara recommends personalised online courses to O&G employees based on their current skills and career goals. Key features:
+
+- **Instant dashboard** — skill gap analysis loads immediately on login (no waiting for AI)
+- **AI learning path** — Ollama-powered course recommendations load asynchronously in the background
+- **Chatbot skill assessment** — conversational AI assesses skill levels through targeted questions, then saves results directly to your profile
+- **Dark/light mode** — system-aware theme with zero flash on page navigation
+- **25-course O&G catalogue** — covers Upstream, Downstream, Technical, and Corporate tracks
 
 ---
 
@@ -251,18 +257,32 @@ Open browser at **http://localhost:5000** ✅
 nadi-pintara/
 │
 ├── data/
-│   ├── roles_skills.json     ← Defines what skills each job role needs
+│   ├── roles_skills.json     ← 12 O&G job roles with required skill levels
 │   ├── employees.json        ← Synthetic employee profiles for testing
-│   └── courses.json          ← Online course catalogue (Coursera, Udemy, etc.)
+│   ├── courses.json          ← 25-course O&G catalogue (Coursera, Udemy, etc.)
+│   └── cache.json            ← Recommendation cache (auto-generated)
 │
 ├── engine/
-│   ├── gap_analyzer.py       ← Calculates what skills the employee is missing
-│   ├── llm_recommender.py    ← Talks to the Qwen2.5 AI to get recommendations
-│   └── path_generator.py     ← Puts it all together into a learning path
+│   ├── gap_analyzer.py       ← Calculates missing skills vs. target role
+│   ├── path_generator.py     ← Orchestrates full learning path generation
+│   ├── llm_recommender.py    ← Builds prompts and calls the LLM
+│   ├── llm_ollama.py         ← Ollama adapter (local AI)
+│   ├── llm_gemini.py         ← Gemini adapter (cloud fallback)
+│   └── chatbot_engine.py     ← Chatbot question bank, keyword scoring,
+│                                assessment summary generation
 │
-├── app.py                    ← The main server (start here!)
-├── test_engine.py            ← Quick test to make sure AI is working
-└── requirements.txt          ← List of Python packages needed
+├── templates/                ← Flask HTML templates (server-rendered)
+│   ├── login.html            ← Employee selector / login page
+│   ├── dashboard.html        ← Main dashboard (skill gaps + AI learning path)
+│   └── courses.html          ← Browseable course catalogue
+│
+├── static/
+│   ├── css/styles.css        ← Design system, dark/light mode, all component styles
+│   └── js/main.js            ← Shared utilities (dark mode, toasts, progress bar)
+│
+├── app.py                    ← Flask server — all routes defined here
+├── test_engine.py            ← Test suite for the AI engine
+└── requirements.txt          ← Python package dependencies
 ```
 
 ---
@@ -271,14 +291,39 @@ nadi-pintara/
 
 Once the server is running, you can open these links in your browser:
 
+**Pages**
+
 | URL | What it does |
 |-----|-------------|
-| `http://localhost:5000/` | Check if server is running |
-| `http://localhost:5000/employees` | See all employee profiles |
-| `http://localhost:5000/roles` | See all job role frameworks |
-| `http://localhost:5000/recommend/E001` | Get AI recommendation for Employee 1 |
-| `http://localhost:5000/recommend/E002` | Get AI recommendation for Employee 2 |
-| `http://localhost:5000/recommend/E003` | Get AI recommendation for Employee 3 |
+| `http://localhost:5000/` | Redirects to login |
+| `http://localhost:5000/login` | Employee selector / login page |
+| `http://localhost:5000/dashboard` | Main dashboard |
+| `http://localhost:5000/courses-page` | Course catalogue |
+
+**Data API** (GET)
+
+| URL | What it does |
+|-----|-------------|
+| `http://localhost:5000/employees` | List all employee profiles |
+| `http://localhost:5000/roles` | List all job role skill requirements |
+| `http://localhost:5000/courses` | List all courses |
+| `http://localhost:5000/employee/E001` | Get a single employee profile |
+| `http://localhost:5000/employee/E001/gap` | Get skill gaps instantly (no LLM, <100ms) |
+| `http://localhost:5000/health` | Server + LLM provider status |
+
+**Recommendation API**
+
+| URL | Method | What it does |
+|-----|--------|-------------|
+| `/recommend/E001` | GET | Full AI recommendation for Employee 1 |
+| `/recommend/custom` | POST | AI recommendation for a custom profile |
+
+**Chatbot API**
+
+| URL | Method | What it does |
+|-----|--------|-------------|
+| `/chatbot/message` | POST | Send a skill assessment question/answer |
+| `/chatbot/summarize` | POST | Generate AI summary of assessment results |
 
 ---
 
@@ -291,7 +336,10 @@ Once the server is running, you can open these links in your browser:
 > You opened a new Command Prompt window. Just run `venv\Scripts\activate` again from inside the project folder.
 
 **The AI is taking too long to respond**
-> Qwen2.5 can take 1–2 minutes on the first run. This is normal — the AI is loading into memory. Subsequent requests are faster.
+> Ollama can take 1–2 minutes on the first run. This is normal — the model is loading into memory. Subsequent requests are faster. The dashboard still shows your skill gap data instantly while the AI loads.
+
+**The chatbot asks a question but I don't see a response**
+> Make sure Flask is running (`python app.py`). If the chatbot completes without an AI summary, the fallback template will still display your assessed skill levels correctly.
 
 **"Connection refused" when opening localhost:5000**
 > The server isn't running. Go back to Command Prompt and run `python app.py` again.

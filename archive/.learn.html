@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Path | Nadi Pintara</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- NADI PINTARA PREMIUM LOADING OVERLAY -->
+    <div id="nadi-loading-screen">
+        <canvas id="nadi-matrix-canvas"></canvas>
+        
+        <div id="nadi-loading-content">
+            <div class="nadi-ai-core">
+                <div class="nadi-ring nadi-ring-outer">
+                    <div class="nadi-orbit-dot dot-1"></div>
+                    <div class="nadi-orbit-dot dot-2"></div>
+                    <div class="nadi-orbit-dot dot-3"></div>
+                </div>
+                <div class="nadi-ring nadi-ring-middle"></div>
+                <div class="nadi-ring nadi-core-inner">
+                    <div class="nadi-logo-nadi">NADI</div>
+                    <div class="nadi-logo-pintara">PINTARA</div>
+                </div>
+            </div>
+
+            <div class="nadi-pipeline">
+                <div class="nadi-stage" id="stage-1">
+                    <span class="nadi-stage-icon">👤</span>
+                    <span class="nadi-stage-label">Profile</span>
+                    <div class="nadi-status-dot"></div>
+                </div>
+                <div class="nadi-stage" id="stage-2">
+                    <span class="nadi-stage-icon">📊</span>
+                    <span class="nadi-stage-label">Gaps</span>
+                    <div class="nadi-status-dot"></div>
+                </div>
+                <div class="nadi-stage" id="stage-3">
+                    <span class="nadi-stage-icon">🎯</span>
+                    <span class="nadi-stage-label">Courses</span>
+                    <div class="nadi-status-dot"></div>
+                </div>
+                <div class="nadi-stage" id="stage-4">
+                    <span class="nadi-stage-icon">🤖</span>
+                    <span class="nadi-stage-label">AI Engine</span>
+                    <div class="nadi-status-dot"></div>
+                </div>
+                <div class="nadi-stage" id="stage-5">
+                    <span class="nadi-stage-icon">🧠</span>
+                    <span class="nadi-stage-label">Analysis</span>
+                    <div class="nadi-status-dot"></div>
+                </div>
+                <div class="nadi-stage" id="stage-6">
+                    <span class="nadi-stage-icon">✨</span>
+                    <span class="nadi-stage-label">Roadmap</span>
+                    <div class="nadi-status-dot"></div>
+                </div>
+            </div>
+
+            <div id="nadi-rotating-message">Initializing analysis...</div>
+            <div id="nadi-elapsed-timer">Analysis in progress · 0:00</div>
+
+            <div class="nadi-progress-container">
+                <div id="nadi-progress-bar"></div>
+            </div>
+            <div id="nadi-progress-text" style="font-size: 0.7rem; color: var(--secondary);">System Readiness: 0%</div>
+        </div>
+
+        <div class="nadi-ticker-wrap">
+            <div class="nadi-ticker">
+                PETRONAS COMPETENCY FRAMEWORK v2.1  ·  AI ENGINE: ACTIVE  ·  SKILL NODES: 47 MAPPED  ·  COURSES INDEXED: 25  ·  NADI PINTARA ANALYSIS ENGINE  ·  UPSTREAM · DOWNSTREAM · TECHNICAL · CORPORATE  ·  PETRONAS COMPETENCY FRAMEWORK v2.1  ·  AI ENGINE: ACTIVE
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR WITH COLLAPSE LOGIC -->
+    <div class="sidebar" id="sidebar">
+        <div class="toggle-btn" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo">
+            <i class="fas fa-brain"></i>
+            <span>Nadi Pintara</span>
+        </div>
+        <div class="menu">
+            <a href="dashboard.html">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="analysis.html">
+                <i class="fas fa-chart-pie"></i>
+                <span>Skill Analysis</span>
+            </a>
+            <a href="learn.html" class="active">
+                <i class="fas fa-book-reader"></i>
+                <span>Learning Path</span>
+            </a>
+            <a href="profile.html">
+                <i class="fas fa-user-circle"></i>
+                <span>Profile</span>
+            </a>
+            <a href="index.html" style="margin-top: auto;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main" id="mainContent">
+        <div class="navbar">
+            <h2>AI Learning Roadmap</h2>
+            <div class="user-info">
+                <div class="user-avatar" id="avatarLetter">?</div>
+                <div id="userName">User</div>
+            </div>
+        </div>
+
+        <div id="loading" style="display: none;"></div>
+
+        <div id="resultContainer" style="display: none;">
+            <div class="card ai-summary-card">
+                <h3><i class="fas fa-magic" style="margin-right: 10px;"></i>AI Strategic Career Roadmap</h3>
+                <p id="aiSummary" style="line-height: 1.6;"></p>
+                <div class="timeline-info">
+                    <div class="timeline-item">
+                        <i class="fas fa-hourglass-half"></i>
+                        <span>Total Estimated Time: <strong id="totalTimeline">...</strong></span>
+                    </div>
+                    <div class="timeline-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Path Goal: Skill Mastery</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="learning-path" id="coursePath">
+                <!-- Course cards will be injected here -->
+            </div>
+        </div>
+
+        <div id="errorContainer" class="card" style="display: none; border-left: 5px solid #ef4444;">
+            <h3 style="color: #ef4444;">AI Engine Unavailable</h3>
+            <p>We couldn't reach the AI recommendation engine. Please ensure it's running or try again later.</p>
+            <button class="btn" style="margin-top: 20px;" onclick="location.reload()">Retry</button>
+        </div>
+    </div>
+
+    <script>
+        // SIDEBAR COLLAPSE LOGIC
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        // Initial state from localStorage
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+        }
+
+        sidebarToggle.addEventListener('click', () => {
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
+            
+            // Re-draw canvas if loading is visible
+            if (document.getElementById('nadi-loading-screen').style.display === 'flex') {
+                NadiLoading.resizeCanvas();
+            }
+        });
+
+        // LOADING ENGINE LOGIC
+        const NadiLoading = {
+            canvas: null,
+            ctx: null,
+            animationFrame: null,
+            startTime: null,
+            timerInterval: null,
+            messageInterval: null,
+            
+            messages: [
+                "Analysing your competency profile...",
+                "Mapping PETRONAS role frameworks...",
+                "Identifying critical skill gaps...",
+                "Scanning course catalogue...",
+                "Evaluating relevance to career path...",
+                "Calibrating AI engine...",
+                "Matching industry best practices...",
+                "Personalising your journey...",
+                "Finalising recommendations..."
+            ],
+
+            initCanvas() {
+                this.canvas = document.getElementById('nadi-matrix-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+
+                const chars = "01%ΣΔ∇πμλφψ∞≈√∂".split("");
+                const fontSize = 14;
+                const columns = this.canvas.width / fontSize;
+                const drops = Array(Math.floor(columns)).fill(1);
+
+                const draw = () => {
+                    this.ctx.fillStyle = "rgba(248, 250, 252, 0.1)"; // Match --bg-color
+                    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.ctx.fillStyle = "#04B5AF22"; // Primary with low alpha
+                    this.ctx.font = fontSize + "px monospace";
+
+                    for (let i = 0; i < drops.length; i++) {
+                        const text = chars[Math.floor(Math.random() * chars.length)];
+                        this.ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                        if (drops[i] * fontSize > this.canvas.height && Math.random() > 0.975) drops[i] = 0;
+                        drops[i]++;
+                    }
+                    this.animationFrame = requestAnimationFrame(draw);
+                };
+                draw();
+            },
+
+            resizeCanvas() {
+                if (this.canvas) {
+                    this.canvas.width = window.innerWidth;
+                    this.canvas.height = window.innerHeight;
+                }
+            },
+
+            show() {
+                document.getElementById('nadi-loading-screen').style.display = 'flex';
+                this.initCanvas();
+                this.startTime = Date.now();
+                
+                const updateStage = (n) => {
+                    if (n > 1) {
+                        const prev = document.getElementById(`stage-${n-1}`);
+                        if (prev) prev.classList.replace('active', 'done');
+                    }
+                    const stage = document.getElementById(`stage-${n}`);
+                    if (stage) stage.classList.add('active');
+                };
+
+                updateStage(1);
+                setTimeout(() => updateStage(2), 2000);
+                setTimeout(() => updateStage(3), 4000);
+                setTimeout(() => updateStage(4), 6000);
+                setTimeout(() => updateStage(5), 8000);
+
+                const bar = document.getElementById('nadi-progress-bar');
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.transition = 'width 30s cubic-bezier(0.1, 0.5, 0.1, 1)';
+                    bar.style.width = '85%';
+                }, 100);
+
+                this.timerInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                    const timeStr = `${Math.floor(elapsed/60)}:${(elapsed%60).toString().padStart(2, '0')}`;
+                    document.getElementById('nadi-elapsed-timer').innerText = `Analysis in progress · ${timeStr}`;
+                    document.getElementById('nadi-progress-text').innerText = `System Readiness: ${Math.min(85, Math.floor(elapsed/0.4))}%`;
+                }, 1000);
+
+                let msgIdx = 0;
+                this.messageInterval = setInterval(() => {
+                    const msgEl = document.getElementById('nadi-rotating-message');
+                    msgEl.style.opacity = 0;
+                    setTimeout(() => {
+                        msgIdx = (msgIdx + 1) % this.messages.length;
+                        msgEl.innerText = this.messages[msgIdx];
+                        msgEl.style.opacity = 1;
+                    }, 500);
+                }, 3000);
+            },
+
+            complete() {
+                document.querySelectorAll('.nadi-stage').forEach(s => s.classList.add('done'));
+                const bar = document.getElementById('nadi-progress-bar');
+                bar.style.transition = 'width 0.5s ease-out';
+                bar.style.width = '100%';
+                document.getElementById('nadi-progress-text').innerText = 'Analysis Complete: 100%';
+            },
+
+            hide() {
+                clearInterval(this.timerInterval);
+                clearInterval(this.messageInterval);
+                cancelAnimationFrame(this.animationFrame);
+                document.getElementById('nadi-loading-screen').style.display = 'none';
+            }
+        };
+
+        const empId = localStorage.getItem('employeeId');
+
+        async function fetchRecommendations() {
+            NadiLoading.show();
+            try {
+                const res = await fetch(`/recommend/${empId}`);
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+
+                document.getElementById('userName').innerText = data.employee.name;
+                document.getElementById('avatarLetter').innerText = data.employee.name.charAt(0);
+
+                const lp = data.learning_path;
+                if (!lp || lp.error) throw new Error("Invalid response");
+
+                NadiLoading.complete();
+
+                setTimeout(() => {
+                    document.getElementById('aiSummary').innerText = lp.summary;
+                    document.getElementById('totalTimeline').innerText = lp.total_timeline;
+                    const pathContainer = document.getElementById('coursePath');
+                    pathContainer.innerHTML = '';
+                    lp.recommended_path.forEach((course, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'course-card';
+                        card.innerHTML = `
+                            <div class="course-title"><span>${course.course_title}</span><span class="course-provider-badge">${course.provider}</span></div>
+                            <div class="course-meta"><span><i class="fas fa-clock"></i> ${course.duration}</span><span><i class="fas fa-layer-group"></i> Step ${index + 1}</span></div>
+                            <div class="course-relevance"><strong>Why recommended</strong>${course.why_relevant}</div>
+                            <div style="display: flex; justify-content: flex-end;"><a href="${course.url}" target="_blank" class="btn btn-outline" style="padding: 8px 20px; font-size: 13px;"><i class="fas fa-external-link-alt" style="margin-right: 8px;"></i> Start Course</a></div>
+                        `;
+                        pathContainer.appendChild(card);
+                    });
+                    document.getElementById('resultContainer').style.display = 'block';
+                    NadiLoading.hide();
+                }, 1000);
+            } catch (err) {
+                console.error(err);
+                NadiLoading.hide();
+                document.getElementById('errorContainer').style.display = 'block';
+            }
+        }
+        fetchRecommendations();
+    </script>
+</body>
+</html>

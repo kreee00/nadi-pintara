@@ -1,35 +1,297 @@
 [
   {
     "id": "E001",
-    "name": "Ahmad Razif",
-    "current_role": "Data Analyst",
-    "target_role": "Data Scientist",
-    "years_experience": 2,
+    "name": "Ahmad Faizal bin Razak",
+    "department": "Upstream",
+    "current_role": "Petroleum Engineer (Junior)",
+    "target_role": "Senior Petroleum Engineer",
+    "years_experience": 4,
+    "education": "B.Eng Petroleum Engineering, Universiti Teknologi PETRONAS (UTP)",
     "current_skills": {
-      "Python": 3, "SQL": 4, "Excel": 4,
-      "Statistics": 2, "Machine Learning": 1, "Power BI": 3
+      "Reservoir Engineering": 3,
+      "Drilling Engineering": 2,
+      "Production Optimization": 2,
+      "Petroleum Geoscience": 3,
+      "Python": 2,
+      "Well Completion": 2,
+      "Fluid Mechanics": 3,
+      "Data Analytics": 2
     }
   },
   {
     "id": "E002",
-    "name": "Nurul Hana",
-    "current_role": "Software Engineer",
-    "target_role": "DevOps Engineer",
-    "years_experience": 3,
+    "name": "Nurul Izzah binti Mansor",
+    "department": "Technical Services & Engineering",
+    "current_role": "Pipeline Integrity Engineer (Senior)",
+    "target_role": "Technical Safety Engineer (Lead)",
+    "years_experience": 10,
+    "education": "B.Eng Mechanical Engineering, Universiti Malaya (UM)",
     "current_skills": {
-      "Python": 4, "Java": 3, "Git": 3,
-      "Docker": 1, "Linux": 2, "SQL": 3
+      "Pipeline Integrity": 5,
+      "Asset Integrity": 4,
+      "Risk Assessment": 3,
+      "HSSE Compliance": 4,
+      "Regulatory Compliance": 4,
+      "SAP ERP": 3,
+      "Project Management": 3,
+      "Fluid Mechanics": 4,
+      "HAZOP": 2,
+      "Process Safety Management": 3
     }
   },
   {
     "id": "E003",
-    "name": "Haziq Farhan",
-    "current_role": "Data Analyst",
-    "target_role": "IT Project Manager",
-    "years_experience": 4,
+    "name": "Tan Wei Shen",
+    "department": "Downstream",
+    "current_role": "Plant Operations Engineer (Junior)",
+    "target_role": "Refinery Process Engineer (Senior)",
+    "years_experience": 5,
+    "education": "B.Eng Chemical Engineering, Monash University Malaysia",
     "current_skills": {
-      "SQL": 4, "Excel": 4, "Power BI": 3,
-      "Project Management": 2, "Agile": 1, "Stakeholder Communication": 2
+      "Plant Operations": 3,
+      "Refinery Process Control": 2,
+      "Process Safety Management": 3,
+      "HSSE Compliance": 4,
+      "Fluid Mechanics": 3,
+      "SAP ERP": 3,
+      "Data Analytics": 2,
+      "Risk Assessment": 2,
+      "HAZOP": 1,
+      "Turnaround Management": 1
+    }
+  },
+  {
+    "id": "E004",
+    "name": "Lingeshwaran a/l Rajan",
+    "department": "Corporate & Business",
+    "current_role": "Data Analyst (O&G focus)",
+    "target_role": "Project Manager (O&G)",
+    "years_experience": 6,
+    "education": "B.Sc Statistics & Computer Science, Universiti Kebangsaan Malaysia (UKM)",
+    "current_skills": {
+      "Data Analytics": 5,
+      "Python": 4,
+      "Power BI": 5,
+      "Machine Learning": 3,
+      "Project Management": 2,
+      "Stakeholder Management": 3,
+      "Refinery Process Control": 2,
+      "Contract Management": 1,
+      "SAP ERP": 2,
+      "Risk Assessment": 2
+    }
+  },
+  {
+    "id": "E005",
+    "name": "Muhammad Arif bin Zulkifli",
+    "department": "Upstream",
+    "current_role": "Drilling Engineer (Lead)",
+    "target_role": "Project Manager (O&G)",
+    "years_experience": 15,
+    "education": "B.Eng Petroleum Engineering, Colorado School of Mines",
+    "current_skills": {
+      "Drilling Engineering": 5,
+      "Well Completion": 5,
+      "Fluid Mechanics": 4,
+      "Process Safety Management": 4,
+      "HAZOP": 3,
+      "HSSE Compliance": 5,
+      "Contract Management": 3,
+      "Project Management": 3,
+      "Stakeholder Management": 3,
+      "SAP ERP": 2
+    }
+  },
+  {
+    "id": "E006",
+    "name": "Siti Aminah binti Yusof",
+    "department": "Corporate & Business",
+    "current_role": "Data Analyst (O&G focus)",
+    "target_role": "HSE Manager",
+    "years_experience": 8,
+    "education": "B.Sc Environmental Science, Universiti Putra Malaysia (UPM)",
+    "current_skills": {
+      "Data Analytics": 4,
+      "Python": 2,
+      "Power BI": 4,
+      "HSSE Compliance": 3,
+      "HSE Management": 2,
+      "Risk Assessment": 3,
+      "Regulatory Compliance": 3,
+      "Stakeholder Management": 3
+    }
+  },
+  {
+    "id": "E007",
+    "name": "Chong Mei Ling",
+    "department": "Downstream",
+    "current_role": "LNG Operations Specialist (Senior)",
+    "target_role": "Project Manager (O&G)",
+    "years_experience": 12,
+    "education": "B.Eng Chemical Engineering, Curtin University Malaysia",
+    "current_skills": {
+      "LNG Operations": 5,
+      "Plant Operations": 5,
+      "Refinery Process Control": 3,
+      "Process Safety Management": 4,
+      "Asset Integrity": 4,
+      "Regulatory Compliance": 4,
+      "Stakeholder Management": 3,
+      "Project Management": 2,
+      "Contract Management": 2,
+      "SAP ERP": 3
+    }
+  },
+  {
+    "id": "E008",
+    "name": "Kamrul bin Idham",
+    "department": "Upstream",
+    "current_role": "Petroleum Engineer (Junior)",
+    "target_role": "Drilling Engineer (Lead)",
+    "years_experience": 3,
+    "education": "B.Eng Petroleum Engineering, UTP",
+    "current_skills": {
+      "Reservoir Engineering": 3,
+      "Drilling Engineering": 2,
+      "Fluid Mechanics": 4,
+      "Python": 3,
+      "Well Completion": 2,
+      "HSSE Compliance": 3,
+      "Project Management": 1,
+      "HAZOP": 1
+    }
+  },
+  {
+    "id": "E009",
+    "name": "Priya binti Abdullah",
+    "department": "Technical Services & Engineering",
+    "current_role": "Pipeline Integrity Engineer (Senior)",
+    "target_role": "Project Manager (O&G)",
+    "years_experience": 11,
+    "education": "B.Eng Civil Engineering, Universiti Teknologi Malaysia (UTM)",
+    "current_skills": {
+      "Pipeline Integrity": 5,
+      "Asset Integrity": 4,
+      "Risk Assessment": 4,
+      "HSSE Compliance": 3,
+      "Project Management": 3,
+      "Contract Management": 2,
+      "Stakeholder Management": 2,
+      "SAP ERP": 4
+    }
+  },
+  {
+    "id": "E010",
+    "name": "Hafiz bin Ramli",
+    "department": "Downstream",
+    "current_role": "Plant Operations Engineer (Junior)",
+    "target_role": "LNG Operations Specialist (Senior)",
+    "years_experience": 4,
+    "education": "B.Eng Mechanical Engineering, UTM",
+    "current_skills": {
+      "Plant Operations": 3,
+      "Refinery Process Control": 2,
+      "Process Safety Management": 2,
+      "HSSE Compliance": 3,
+      "LNG Operations": 1,
+      "Asset Integrity": 2,
+      "Regulatory Compliance": 2,
+      "Turnaround Management": 1
+    }
+  },
+  {
+    "id": "E011",
+    "name": "Sangeetha Ravichandran",
+    "department": "Upstream",
+    "current_role": "Petroleum Engineer (Junior)",
+    "target_role": "Data Analyst (O&G focus)",
+    "years_experience": 2,
+    "education": "B.Sc Geoscience, UM",
+    "current_skills": {
+      "Petroleum Geoscience": 4,
+      "Reservoir Engineering": 2,
+      "Python": 2,
+      "Data Analytics": 2,
+      "Power BI": 1,
+      "Statistics": 3,
+      "Fluid Mechanics": 2,
+      "Stakeholder Management": 2
+    }
+  },
+  {
+    "id": "E012",
+    "name": "Zulkhairi bin Idris",
+    "department": "Corporate & Business",
+    "current_role": "Project Manager (O&G)",
+    "target_role": "HSE Manager",
+    "years_experience": 18,
+    "education": "MBA Oil & Gas Management, Robert Gordon University",
+    "current_skills": {
+      "Project Management": 5,
+      "Contract Management": 5,
+      "Stakeholder Management": 5,
+      "Risk Assessment": 4,
+      "HSE Management": 3,
+      "HSSE Compliance": 4,
+      "Regulatory Compliance": 4,
+      "Incident Investigation": 2
+    }
+  },
+  {
+    "id": "E013",
+    "name": "Michelle Wong Siew Ling",
+    "department": "Downstream",
+    "current_role": "Refinery Process Engineer (Senior)",
+    "target_role": "HSE Manager",
+    "years_experience": 14,
+    "education": "B.Eng Chemical Engineering, UM",
+    "current_skills": {
+      "Refinery Process Control": 5,
+      "Plant Operations": 4,
+      "Process Safety Management": 5,
+      "HAZOP": 5,
+      "HSE Management": 3,
+      "HSSE Compliance": 4,
+      "Risk Assessment": 4,
+      "Stakeholder Management": 3
+    }
+  },
+  {
+    "id": "E014",
+    "name": "Farhan bin Osman",
+    "department": "Upstream",
+    "current_role": "Drilling Engineer (Lead)",
+    "target_role": "Senior Petroleum Engineer",
+    "years_experience": 13,
+    "education": "B.Eng Petroleum Engineering, UTP",
+    "current_skills": {
+      "Drilling Engineering": 5,
+      "Well Completion": 5,
+      "Fluid Mechanics": 4,
+      "Reservoir Engineering": 2,
+      "Production Optimization": 3,
+      "Petroleum Geoscience": 2,
+      "Python": 2,
+      "Asset Integrity": 3
+    }
+  },
+  {
+    "id": "E015",
+    "name": "Ananthi a/p Krishnan",
+    "department": "Technical Services & Engineering",
+    "current_role": "Technical Safety Engineer (Lead)",
+    "target_role": "HSE Manager",
+    "years_experience": 16,
+    "education": "M.Sc Process Safety, UTP",
+    "current_skills": {
+      "Process Safety Management": 5,
+      "HAZOP": 5,
+      "Risk Assessment": 5,
+      "HSSE Compliance": 5,
+      "HSE Management": 3,
+      "Stakeholder Management": 4,
+      "Regulatory Compliance": 4,
+      "Crisis Management": 3
     }
   }
 ]

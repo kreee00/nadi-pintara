@@ -1,79 +1,66 @@
-import requests
+import os
 import json
-import re
+from dotenv import load_dotenv
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "qwen2.5:latest"
+load_dotenv(override=True)
 
-def ask_qwen(prompt):
-    response = requests.post(
-        OLLAMA_URL,
-        json={
-            "model": MODEL,
-            "prompt": prompt,
-            "stream": False,
-            "options": {
-                "temperature": 0.3,   # Lower = more consistent JSON output
-                "top_p": 0.9
-            }
-        },
-        timeout=120  # Qwen can take up to 2 minutes on your hardware
-    )
-    return response.json()["response"]
+PROVIDER = os.getenv("LLM_PROVIDER", "gemini").lower()
+BASE = os.path.dirname(os.path.dirname(__file__))
 
-def parse_json_response(text):
-    # Strip markdown code fences if Qwen adds them
-    text = re.sub(r"```json|```", "", text).strip()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        # Try to extract JSON object from the response
-        match = re.search(r'\{.*\}', text, re.DOTALL)
-        if match:
-            try:
-                return json.loads(match.group())
-            except:
-                pass
-        return {"error": "Could not parse response", "raw": text}
+if PROVIDER == "ollama":
+    from engine.llm_ollama import get_recommendations as _get_raw_recommendations
+    print(f"[LLM] Using Ollama ({os.getenv('OLLAMA_MODEL', 'llama3.2:3b')})")
+else:
+    from engine.llm_gemini import get_recommendations as _get_raw_recommendations
+    print("[LLM] Using Gemini 2.5 Flash")
 
 def get_recommendations(employee, skill_gaps, courses):
-    prompt = f"""You are a corporate learning advisor. Your job is to recommend the best online courses for an employee based on their skill gaps.
+    """
+    Wrapper that calls the selected LLM and then hydrates the results
+    with full course metadata to ensure callers (like test_engine.py)
+    always receive complete JSON objects.
+    """
+    # 1. Get the slim/raw response from the LLM
+    result = _get_raw_recommendations(employee, skill_gaps, courses)
+    
+    # 2. If it's an error or already hydrated, return as is
+    if not result or "error" in result or "recommended_path" not in result:
+        return result
 
-EMPLOYEE:
-Name: {employee['name']}
-Current Role: {employee['current_role']}
-Target Role: {employee['target_role']}
-Years of Experience: {employee['years_experience']}
+    # 3. Hydrate with full course data
+    # (Note: In a larger app, we'd avoid re-loading courses.json here, 
+    # but for this script it ensures consistency for all callers)
+    all_courses_path = os.path.join(BASE, "data/courses.json")
+    try:
+        with open(all_courses_path, "r") as f:
+            all_courses = json.load(f)
+    except:
+        all_courses = courses # Fallback to the filtered list provided
 
-SKILL GAPS (skill: current level → required level, scale 1-5):
-{json.dumps(skill_gaps, indent=2)}
+    return hydrate_recommendations(result, all_courses)
 
-AVAILABLE COURSES:
-{json.dumps(courses, indent=2)}
-
-INSTRUCTIONS:
-- Select only the most relevant 3 to 5 courses from the list above
-- Prioritise courses that address the biggest skill gaps first
-- Only recommend courses that exist in the list above
-- Respond ONLY with a valid JSON object, no explanation, no markdown
-
-Use this exact JSON format:
-{{
-  "recommended_path": [
-    {{
-      "order": 1,
-      "course_id": "C001",
-      "course_title": "Course title here",
-      "provider": "Provider here",
-      "url": "URL here",
-      "duration": "Duration here",
-      "skills_addressed": ["Skill1", "Skill2"],
-      "why_relevant": "One sentence explanation specific to this employee"
-    }}
-  ],
-  "total_timeline": "Estimated total duration e.g. 4-5 months",
-  "summary": "Two sentence personalised summary for the employee"
-}}"""
-
-    raw_response = ask_qwen(prompt)
-    return parse_json_response(raw_response)
+def hydrate_recommendations(slim_recom, all_courses):
+    """Re-attaches course metadata to minimal LLM output"""
+    course_map = {c["id"]: c for c in all_courses}
+    
+    hydrated_path = []
+    for item in slim_recom["recommended_path"]:
+        cid = item.get("course_id")
+        if cid in course_map:
+            course = course_map[cid]
+            hydrated_path.append({
+                "order": item.get("order"),
+                "course_id": cid,
+                "course_title": course["title"],
+                "provider": course["provider"],
+                "url": course["url"],
+                "duration": course["duration"],
+                "skills_addressed": course["skills_covered"],
+                "why_relevant": item.get("why_relevant")
+            })
+    
+    return {
+        "recommended_path": hydrated_path,
+        "total_timeline": slim_recom.get("total_timeline", "N/A"),
+        "summary": slim_recom.get("summary", "")
+    }

@@ -1,37 +1,182 @@
 {
-  "Data Analyst": {
-    "description": "Analyses data to generate business insights",
+  "Petroleum Engineer (Junior)": {
+    "description": "Assists in the evaluation of oil and gas reservoirs and the design of optimal recovery systems.",
+    "department": "Upstream",
+    "grade": "Junior",
     "required_skills": {
-      "Python": 3, "SQL": 4, "Excel": 4,
-      "Statistics": 3, "Power BI": 3, "Data Visualization": 3
+      "Reservoir Engineering": 3,
+      "Drilling Engineering": 2,
+      "Production Optimization": 2,
+      "Petroleum Geoscience": 3,
+      "Python": 2,
+      "Well Completion": 2,
+      "Fluid Mechanics": 3,
+      "Data Analytics": 2
     }
   },
-  "Data Scientist": {
-    "description": "Builds ML models and drives data strategy",
+  "Senior Petroleum Engineer": {
+    "description": "Leads complex reservoir studies and oversees production optimization strategies for major assets.",
+    "department": "Upstream",
+    "grade": "Senior",
     "required_skills": {
-      "Python": 5, "SQL": 3, "Machine Learning": 4,
-      "Statistics": 5, "Deep Learning": 3, "Power BI": 2
+      "Reservoir Engineering": 5,
+      "Drilling Engineering": 3,
+      "Production Optimization": 5,
+      "Petroleum Geoscience": 4,
+      "Python": 3,
+      "Well Completion": 4,
+      "Asset Integrity": 4,
+      "Stakeholder Management": 3
     }
   },
-  "Software Engineer": {
-    "description": "Develops and maintains software systems",
+  "Drilling Engineer (Lead)": {
+    "description": "Responsible for the planning and execution of safe and efficient drilling operations.",
+    "department": "Upstream",
+    "grade": "Lead",
     "required_skills": {
-      "Python": 4, "Java": 4, "SQL": 3,
-      "System Design": 4, "Git": 4, "REST APIs": 4
+      "Drilling Engineering": 5,
+      "Well Completion": 5,
+      "Fluid Mechanics": 4,
+      "Process Safety Management": 4,
+      "HAZOP": 3,
+      "HSSE Compliance": 5,
+      "Contract Management": 4,
+      "Project Management": 4
     }
   },
-  "DevOps Engineer": {
-    "description": "Manages infrastructure, CI/CD, and deployments",
+  "Subsea Engineer (Senior)": {
+    "description": "Specializes in the design and integrity of subsea production systems and pipelines.",
+    "department": "Upstream",
+    "grade": "Senior",
     "required_skills": {
-      "Linux": 4, "Docker": 4, "Kubernetes": 3,
-      "CI/CD": 4, "Python": 3, "Git": 5
+      "Subsea Engineering": 5,
+      "Pipeline Integrity": 4,
+      "Fluid Mechanics": 5,
+      "Asset Integrity": 4,
+      "Risk Assessment": 4,
+      "Project Management": 3,
+      "HSSE Compliance": 4,
+      "Regulatory Compliance": 3
     }
   },
-  "IT Project Manager": {
-    "description": "Leads technical projects and cross-functional teams",
+  "Refinery Process Engineer (Senior)": {
+    "description": "Optimizes refinery unit performance and ensures process safety across downstream operations.",
+    "department": "Downstream",
+    "grade": "Senior",
     "required_skills": {
-      "Project Management": 5, "Agile": 4, "Risk Management": 4,
-      "Stakeholder Communication": 5, "Budgeting": 3, "SQL": 2
+      "Refinery Process Control": 5,
+      "Plant Operations": 4,
+      "Process Safety Management": 5,
+      "HAZOP": 5,
+      "Asset Integrity": 4,
+      "Turnaround Management": 4,
+      "Power BI": 3,
+      "Risk Assessment": 4
+    }
+  },
+  "Plant Operations Engineer (Junior)": {
+    "description": "Supports day-to-day operations and maintenance of refinery or petrochemical plant units.",
+    "department": "Downstream",
+    "grade": "Junior",
+    "required_skills": {
+      "Plant Operations": 3,
+      "Refinery Process Control": 2,
+      "Process Safety Management": 3,
+      "HSSE Compliance": 4,
+      "Fluid Mechanics": 3,
+      "SAP ERP": 3,
+      "Data Analytics": 2,
+      "Risk Assessment": 2
+    }
+  },
+  "LNG Operations Specialist (Senior)": {
+    "description": "Oversees the liquefaction, storage, and loading operations of LNG assets.",
+    "department": "Downstream",
+    "grade": "Senior",
+    "required_skills": {
+      "LNG Operations": 5,
+      "Plant Operations": 5,
+      "Refinery Process Control": 3,
+      "Process Safety Management": 4,
+      "Asset Integrity": 4,
+      "Regulatory Compliance": 4,
+      "Stakeholder Management": 3,
+      "Turnaround Management": 3
+    }
+  },
+  "Technical Safety Engineer (Lead)": {
+    "description": "Expert in safety lifecycle management, technical risk studies, and major accident prevention.",
+    "department": "Technical Services & Engineering",
+    "grade": "Lead",
+    "required_skills": {
+      "Process Safety Management": 5,
+      "HAZOP": 5,
+      "Risk Assessment": 5,
+      "HSSE Compliance": 5,
+      "Regulatory Compliance": 5,
+      "Stakeholder Management": 4,
+      "Asset Integrity": 4,
+      "Incident Investigation": 4
+    }
+  },
+  "Pipeline Integrity Engineer (Senior)": {
+    "description": "Ensures the safe and reliable operation of midstream and upstream pipeline networks.",
+    "department": "Technical Services & Engineering",
+    "grade": "Senior",
+    "required_skills": {
+      "Pipeline Integrity": 5,
+      "Asset Integrity": 5,
+      "Risk Assessment": 4,
+      "HSSE Compliance": 4,
+      "Regulatory Compliance": 4,
+      "SAP ERP": 3,
+      "Project Management": 3,
+      "Fluid Mechanics": 4
+    }
+  },
+  "Data Analyst (O&G focus)": {
+    "description": "Translates operational data from sensors and wells into actionable business insights.",
+    "department": "Corporate & Business",
+    "grade": "Junior",
+    "required_skills": {
+      "Data Analytics": 5,
+      "Python": 4,
+      "Power BI": 5,
+      "Machine Learning": 3,
+      "Project Management": 2,
+      "Stakeholder Management": 3,
+      "Refinery Process Control": 2,
+      "Reservoir Engineering": 2
+    }
+  },
+  "Project Manager (O&G)": {
+    "description": "Manages large-scale capital projects from FEED through to commissioning.",
+    "department": "Corporate & Business",
+    "grade": "Manager",
+    "required_skills": {
+      "Project Management": 5,
+      "Contract Management": 5,
+      "Stakeholder Management": 5,
+      "Risk Assessment": 4,
+      "SAP ERP": 4,
+      "Budgeting & Finance": 4,
+      "Regulatory Compliance": 4,
+      "Turnaround Management": 3
+    }
+  },
+  "HSE Manager": {
+    "description": "Defines and implements the corporate HSSE strategy to ensure zero LTI and environmental compliance.",
+    "department": "Corporate & Business",
+    "grade": "Manager",
+    "required_skills": {
+      "HSE Management": 5,
+      "HSSE Compliance": 5,
+      "Regulatory Compliance": 5,
+      "Process Safety Management": 4,
+      "Risk Assessment": 5,
+      "Stakeholder Management": 5,
+      "Crisis Management": 4,
+      "Incident Investigation": 5
     }
   }
 }

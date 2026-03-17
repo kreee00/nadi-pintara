@@ -1,92 +1,252 @@
 [
   {
     "id": "C001",
-    "title": "Machine Learning Specialization",
-    "provider": "Coursera – Andrew Ng",
-    "url": "https://www.coursera.org/specializations/machine-learning-introduction",
-    "skills_covered": ["Machine Learning", "Python", "Statistics"],
-    "level": "Intermediate",
-    "duration": "3 months"
+    "title": "Reservoir Engineering: Advanced Simulation & Modeling",
+    "provider": "Petroskills",
+    "url": "https://www.petroskills.com/course/reservoir-simulation",
+    "skills_covered": ["Reservoir Engineering", "Python", "Data Analytics"],
+    "level": "Advanced",
+    "duration": "2 months",
+    "relevance_tags": ["Upstream"]
   },
   {
     "id": "C002",
-    "title": "Deep Learning Specialization",
-    "provider": "Coursera – DeepLearning.AI",
-    "url": "https://www.coursera.org/specializations/deep-learning",
-    "skills_covered": ["Deep Learning", "Python", "Machine Learning"],
-    "level": "Advanced",
-    "duration": "4 months"
+    "title": "Well Completion & Workover Operations",
+    "provider": "IHRDC",
+    "url": "https://www.ihrdc.com/well-completion",
+    "skills_covered": ["Well Completion", "Drilling Engineering", "Fluid Mechanics"],
+    "level": "Intermediate",
+    "duration": "6 weeks",
+    "relevance_tags": ["Upstream"]
   },
   {
     "id": "C003",
-    "title": "Docker and Kubernetes: The Complete Guide",
-    "provider": "Udemy – Stephen Grider",
-    "url": "https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide",
-    "skills_covered": ["Docker", "Kubernetes", "CI/CD"],
-    "level": "Intermediate",
-    "duration": "6 weeks"
+    "title": "Subsea Production Systems Design",
+    "provider": "SPE (Society of Petroleum Engineers)",
+    "url": "https://www.spe.org/training/subsea-systems",
+    "skills_covered": ["Subsea Engineering", "Fluid Mechanics", "Asset Integrity"],
+    "level": "Advanced",
+    "duration": "3 months",
+    "relevance_tags": ["Upstream", "Technical Services & Engineering"]
   },
   {
     "id": "C004",
-    "title": "Linux Command Line Basics",
-    "provider": "Coursera – UC Davis",
-    "url": "https://www.coursera.org/learn/unix",
-    "skills_covered": ["Linux"],
-    "level": "Beginner",
-    "duration": "2 weeks"
+    "title": "Process Safety Management (PSM) for Engineers",
+    "provider": "Petroskills",
+    "url": "https://www.petroskills.com/course/psm-essentials",
+    "skills_covered": ["Process Safety Management", "Risk Assessment", "HAZOP"],
+    "level": "Intermediate",
+    "duration": "4 weeks",
+    "relevance_tags": ["Upstream", "Downstream", "Technical Services & Engineering"]
   },
   {
     "id": "C005",
-    "title": "Statistics for Data Science with Python",
-    "provider": "Coursera – IBM",
-    "url": "https://www.coursera.org/learn/statistics-for-data-science-python",
-    "skills_covered": ["Statistics", "Python"],
-    "level": "Intermediate",
-    "duration": "5 weeks"
+    "title": "Pipeline Integrity Management & Assessment",
+    "provider": "Petroskills",
+    "url": "https://www.petroskills.com/course/pipeline-integrity",
+    "skills_covered": ["Pipeline Integrity", "Asset Integrity", "Regulatory Compliance"],
+    "level": "Advanced",
+    "duration": "8 weeks",
+    "relevance_tags": ["Upstream", "Technical Services & Engineering"]
   },
   {
     "id": "C006",
-    "title": "Google Project Management Certificate",
-    "provider": "Coursera – Google",
-    "url": "https://www.coursera.org/professional-certificates/google-project-management",
-    "skills_covered": ["Project Management", "Agile", "Risk Management", "Stakeholder Communication"],
-    "level": "Beginner",
-    "duration": "6 months"
+    "title": "Refinery Process Optimization & Control",
+    "provider": "IHRDC",
+    "url": "https://www.ihrdc.com/refinery-optimization",
+    "skills_covered": ["Refinery Process Control", "Plant Operations", "Data Analytics"],
+    "level": "Advanced",
+    "duration": "10 weeks",
+    "relevance_tags": ["Downstream"]
   },
   {
     "id": "C007",
-    "title": "DevOps Beginners to Advanced with Projects",
-    "provider": "Udemy",
-    "url": "https://www.udemy.com/course/decodingdevops",
-    "skills_covered": ["CI/CD", "Linux", "Docker", "Git"],
+    "title": "LNG Value Chain & Terminal Operations",
+    "provider": "SPE",
+    "url": "https://training.spe.org/lng-ops",
+    "skills_covered": ["LNG Operations", "Plant Operations", "Regulatory Compliance"],
     "level": "Intermediate",
-    "duration": "8 weeks"
+    "duration": "5 weeks",
+    "relevance_tags": ["Downstream"]
   },
   {
     "id": "C008",
-    "title": "Git & GitHub Bootcamp",
-    "provider": "Udemy – Colt Steele",
-    "url": "https://www.udemy.com/course/git-and-github-bootcamp",
-    "skills_covered": ["Git"],
-    "level": "Beginner",
-    "duration": "2 weeks"
+    "title": "HAZOP Leader Training & Certification",
+    "provider": "Petroskills",
+    "url": "https://www.petroskills.com/hazop-lead",
+    "skills_covered": ["HAZOP", "Risk Assessment", "Process Safety Management"],
+    "level": "Advanced",
+    "duration": "2 weeks",
+    "relevance_tags": ["Upstream", "Downstream", "Technical Services & Engineering"]
   },
   {
     "id": "C009",
-    "title": "Power BI Desktop for Business Intelligence",
-    "provider": "Udemy – Maven Analytics",
-    "url": "https://www.udemy.com/course/microsoft-power-bi-up-running-with-power-bi-desktop",
-    "skills_covered": ["Power BI", "Data Visualization"],
+    "title": "Data Science for Oil & Gas Professionals",
+    "provider": "Udemy",
+    "url": "https://www.udemy.com/course/data-science-og",
+    "skills_covered": ["Data Analytics", "Python", "Machine Learning"],
     "level": "Intermediate",
-    "duration": "3 weeks"
+    "duration": "12 weeks",
+    "relevance_tags": ["Upstream", "Downstream", "Corporate & Business"]
   },
   {
     "id": "C010",
-    "title": "Agile Project Management",
+    "title": "Project Management Professional (PMP) Certification Prep",
     "provider": "Coursera – Google",
-    "url": "https://www.coursera.org/learn/agile-project-management",
-    "skills_covered": ["Agile", "Project Management"],
+    "url": "https://www.coursera.org/pmp-prep",
+    "skills_covered": ["Project Management", "Stakeholder Management", "Risk Assessment"],
+    "level": "Intermediate",
+    "duration": "6 months",
+    "relevance_tags": ["Corporate & Business", "Technical Services & Engineering"]
+  },
+  {
+    "id": "C011",
+    "title": "HSSE Compliance & Corporate Governance",
+    "provider": "LinkedIn Learning",
+    "url": "https://www.linkedin.com/learning/hsse-compliance",
+    "skills_covered": ["HSSE Compliance", "Regulatory Compliance", "HSE Management"],
     "level": "Beginner",
-    "duration": "4 weeks"
+    "duration": "3 weeks",
+    "relevance_tags": ["Corporate & Business", "Upstream", "Downstream"]
+  },
+  {
+    "id": "C012",
+    "title": "Strategic Stakeholder Management",
+    "provider": "Coursera",
+    "url": "https://www.coursera.org/stakeholder-strategy",
+    "skills_covered": ["Stakeholder Management", "Project Management", "Crisis Management"],
+    "level": "Advanced",
+    "duration": "4 weeks",
+    "relevance_tags": ["Corporate & Business"]
+  },
+  {
+    "id": "C013",
+    "title": "Refining Turnaround & Maintenance Management",
+    "provider": "Petroskills",
+    "url": "https://www.petroskills.com/turnaround-mgmt",
+    "skills_covered": ["Turnaround Management", "Plant Operations", "SAP ERP"],
+    "level": "Advanced",
+    "duration": "6 weeks",
+    "relevance_tags": ["Downstream"]
+  },
+  {
+    "id": "C014",
+    "title": "Asset Integrity Management Systems (AIMS)",
+    "provider": "IHRDC",
+    "url": "https://www.ihrdc.com/aims",
+    "skills_covered": ["Asset Integrity", "Risk Assessment", "HSSE Compliance"],
+    "level": "Intermediate",
+    "duration": "2 months",
+    "relevance_tags": ["Technical Services & Engineering", "Upstream", "Downstream"]
+  },
+  {
+    "id": "C015",
+    "title": "Petroleum Geoscience & Formation Evaluation",
+    "provider": "SPE",
+    "url": "https://training.spe.org/geoscience",
+    "skills_covered": ["Petroleum Geoscience", "Reservoir Engineering", "Data Analytics"],
+    "level": "Intermediate",
+    "duration": "3 months",
+    "relevance_tags": ["Upstream"]
+  },
+  {
+    "id": "C016",
+    "title": "Python for Engineers & Geoscientists",
+    "provider": "Udemy",
+    "url": "https://www.udemy.com/course/python-og-engineering",
+    "skills_covered": ["Python", "Data Analytics", "Fluid Mechanics"],
+    "level": "Beginner",
+    "duration": "8 weeks",
+    "relevance_tags": ["Upstream", "Technical Services & Engineering"]
+  },
+  {
+    "id": "C017",
+    "title": "Contract Management in Energy Capital Projects",
+    "provider": "LinkedIn Learning",
+    "url": "https://www.linkedin.com/learning/energy-contract-mgmt",
+    "skills_covered": ["Contract Management", "Project Management", "Regulatory Compliance"],
+    "level": "Advanced",
+    "duration": "5 weeks",
+    "relevance_tags": ["Corporate & Business"]
+  },
+  {
+    "id": "C018",
+    "title": "SAP ERP for Plant Maintenance & Logistics",
+    "provider": "Udemy",
+    "url": "https://www.udemy.com/course/sap-pm-logistics",
+    "skills_covered": ["SAP ERP", "Plant Operations", "Asset Integrity"],
+    "level": "Intermediate",
+    "duration": "4 weeks",
+    "relevance_tags": ["Downstream", "Upstream"]
+  },
+  {
+    "id": "C019",
+    "title": "Strategic HSE Leadership & Management",
+    "provider": "OPITO",
+    "url": "https://www.opito.com/hse-leadership",
+    "skills_covered": ["HSE Management", "HSSE Compliance", "Stakeholder Management"],
+    "level": "Advanced",
+    "duration": "3 months",
+    "relevance_tags": ["Corporate & Business"]
+  },
+  {
+    "id": "C020",
+    "title": "Incident Investigation & Root Cause Analysis",
+    "provider": "OPITO",
+    "url": "https://www.opito.com/root-cause-analysis",
+    "skills_covered": ["Incident Investigation", "Risk Assessment", "HSE Management"],
+    "level": "Advanced",
+    "duration": "4 weeks",
+    "relevance_tags": ["Corporate & Business", "Technical Services & Engineering"]
+  },
+  {
+    "id": "C021",
+    "title": "Crisis Management & Communication in Energy",
+    "provider": "edX",
+    "url": "https://www.edx.org/course/energy-crisis-mgmt",
+    "skills_covered": ["Crisis Management", "Stakeholder Management", "HSE Management"],
+    "level": "Advanced",
+    "duration": "6 weeks",
+    "relevance_tags": ["Corporate & Business"]
+  },
+  {
+    "id": "C022",
+    "title": "Mastering Power BI for Energy Operations",
+    "provider": "Coursera",
+    "url": "https://www.coursera.org/energy-powerbi",
+    "skills_covered": ["Power BI", "Data Analytics", "Data Visualization"],
+    "level": "Intermediate",
+    "duration": "5 weeks",
+    "relevance_tags": ["Upstream", "Downstream", "Corporate & Business"]
+  },
+  {
+    "id": "C023",
+    "title": "Machine Learning for Reservoir Prediction",
+    "provider": "Petroskills",
+    "url": "https://www.petroskills.com/course/ml-reservoir",
+    "skills_covered": ["Machine Learning", "Reservoir Engineering", "Python"],
+    "level": "Advanced",
+    "duration": "10 weeks",
+    "relevance_tags": ["Upstream"]
+  },
+  {
+    "id": "C024",
+    "title": "Drilling & Well Construction Mastery",
+    "provider": "Petroskills",
+    "url": "https://www.petroskills.com/course/drilling-mastery",
+    "skills_covered": ["Drilling Engineering", "Well Completion", "Process Safety Management"],
+    "level": "Advanced",
+    "duration": "4 months",
+    "relevance_tags": ["Upstream"]
+  },
+  {
+    "id": "C025",
+    "title": "Regulatory Compliance & Environmental Law (Malaysia focus)",
+    "provider": "UTP Executive Education",
+    "url": "https://www.utp.edu.my/exec-ed/environmental-law",
+    "skills_covered": ["Regulatory Compliance", "HSSE Compliance", "Stakeholder Management"],
+    "level": "Intermediate",
+    "duration": "4 weeks",
+    "relevance_tags": ["Corporate & Business", "Upstream", "Downstream"]
   }
 ]
