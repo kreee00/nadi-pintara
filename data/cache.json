@@ -1,225 +1,21 @@
 {
-  "9b99e8f30314b540f89f76dc2627f6266bccd6f1f3a92e503f361ab74abdaf22": {
-    "timestamp": 1773760623.4547234,
-    "data": {
-      "recommended_path": [
-        {
-          "order": 1,
-          "course_id": "C020",
-          "course_title": "Incident Investigation & Root Cause Analysis",
-          "provider": "OPITO",
-          "url": "https://www.opito.com/root-cause-analysis",
-          "duration": "4 weeks",
-          "skills_addressed": [
-            "Incident Investigation",
-            "Risk Assessment",
-            "HSE Management"
-          ],
-          "why_relevant": "Incident Investigation gap: 0->5"
-        },
-        {
-          "order": 2,
-          "course_id": "C004",
-          "course_title": "Process Safety Management (PSM) for Engineers",
-          "provider": "Petroskills",
-          "url": "https://www.petroskills.com/course/psm-essentials",
-          "duration": "4 weeks",
-          "skills_addressed": [
-            "Process Safety Management",
-            "Risk Assessment",
-            "HAZOP"
-          ],
-          "why_relevant": "Process Safety Management gap: 0->4"
-        },
-        {
-          "order": 3,
-          "course_id": "C021",
-          "course_title": "Crisis Management & Communication in Energy",
-          "provider": "edX",
-          "url": "https://www.edx.org/course/energy-crisis-mgmt",
-          "duration": "6 weeks",
-          "skills_addressed": [
-            "Crisis Management",
-            "Stakeholder Management",
-            "HSE Management"
-          ],
-          "why_relevant": "Crisis Management gap: 0->4"
-        }
-      ],
-      "total_timeline": "N/A",
-      "summary": ""
-    }
-  },
-  "eddfe57928cf48c021f42b5f2197373a50f3f2a5cc7b2c93d6ec0a3b5ee08e19": {
-    "timestamp": 1773760940.0019097,
-    "data": {
-      "recommended_path": [
-        {
-          "order": 1,
-          "course_id": "C020",
-          "course_title": "Incident Investigation & Root Cause Analysis",
-          "provider": "OPITO",
-          "url": "https://www.opito.com/root-cause-analysis",
-          "duration": "4 weeks",
-          "skills_addressed": [
-            "Incident Investigation",
-            "Risk Assessment",
-            "HSE Management"
-          ],
-          "why_relevant": "Incident Investigation & Root Cause Analysis covers Incident Investigation gap."
-        },
-        {
-          "order": 2,
-          "course_id": "C008",
-          "course_title": "HAZOP Leader Training & Certification",
-          "provider": "Petroskills",
-          "url": "https://www.petroskills.com/hazop-lead",
-          "duration": "2 weeks",
-          "skills_addressed": [
-            "HAZOP",
-            "Risk Assessment",
-            "Process Safety Management"
-          ],
-          "why_relevant": null
-        },
-        {
-          "order": 3,
-          "course_id": "C004",
-          "course_title": "Process Safety Management (PSM) for Engineers",
-          "provider": "Petroskills",
-          "url": "https://www.petroskills.com/course/psm-essentials",
-          "duration": "4 weeks",
-          "skills_addressed": [
-            "Process Safety Management",
-            "Risk Assessment",
-            "HAZOP"
-          ],
-          "why_relevant": "Process Safety Management (PSM) for Engineers covers Process Safety Management gap"
-        }
-      ],
-      "total_timeline": "N/A",
-      "summary": ""
-    }
-  },
-  "5cb922fd1d6456c71bcade070954eb13bc25f4615cf39415f9dcf54077d7640f": {
-    "timestamp": 1773761325.892011,
-    "data": {
-      "recommended_path": [
-        {
-          "order": 1,
-          "course_id": "C020",
-          "course_title": "Incident Investigation & Root Cause Analysis",
-          "provider": "OPITO",
-          "url": "https://www.opito.com/root-cause-analysis",
-          "duration": "4 weeks",
-          "skills_addressed": [
-            "Incident Investigation",
-            "Risk Assessment",
-            "HSE Management"
-          ],
-          "why_relevant": "Incident Investigation: 0->5"
-        },
-        {
-          "order": 2,
-          "course_id": "C019",
-          "course_title": "Strategic HSE Leadership & Management",
-          "provider": "OPITO",
-          "url": "https://www.opito.com/hse-leadership",
-          "duration": "3 months",
-          "skills_addressed": [
-            "HSE Management",
-            "HSSE Compliance",
-            "Stakeholder Management"
-          ],
-          "why_relevant": "HSE Management: 3->5"
-        },
-        {
-          "order": 3,
-          "course_id": "C025",
-          "course_title": "Regulatory Compliance & Environmental Law (Malaysia focus)",
-          "provider": "UTP Executive Education",
-          "url": "https://www.utp.edu.my/exec-ed/environmental-law",
-          "duration": "4 weeks",
-          "skills_addressed": [
-            "Regulatory Compliance",
-            "HSSE Compliance",
-            "Stakeholder Management"
-          ],
-          "why_relevant": "Regulatory Compliance: 4->5"
-        }
-      ],
-      "total_timeline": "N/A",
-      "summary": ""
-    }
-  },
-  "b4adc77675248af8d39bb79ffc8f1ecb39b7a58ad908dbcd309cbda8ad51b04e": {
-    "timestamp": 1773762196.6493008,
-    "data": {
-      "recommended_path": [
-        {
-          "order": 1,
-          "course_id": "C003",
-          "course_title": "Subsea Production Systems Design",
-          "provider": "SPE (Society of Petroleum Engineers)",
-          "url": "https://www.spe.org/training/subsea-systems",
-          "duration": "3 months",
-          "skills_addressed": [
-            "Subsea Engineering",
-            "Fluid Mechanics",
-            "Asset Integrity"
-          ],
-          "why_relevant": "Covers Asset Integrity gap."
-        },
-        {
-          "order": 2,
-          "course_id": "C023",
-          "course_title": "Machine Learning for Reservoir Prediction",
-          "provider": "Petroskills",
-          "url": "https://www.petroskills.com/course/ml-reservoir",
-          "duration": "10 weeks",
-          "skills_addressed": [
-            "Machine Learning",
-            "Reservoir Engineering",
-            "Python"
-          ],
-          "why_relevant": "Covers Machine Learning for Reservoir Prediction gap."
-        },
-        {
-          "order": 3,
-          "course_id": "C005",
-          "course_title": "Pipeline Integrity Management & Assessment",
-          "provider": "Petroskills",
-          "url": "https://www.petroskills.com/course/pipeline-integrity",
-          "duration": "8 weeks",
-          "skills_addressed": [
-            "Pipeline Integrity",
-            "Asset Integrity",
-            "Regulatory Compliance"
-          ],
-          "why_relevant": "Covers Pipeline Integrity Management & Assessment gap."
-        }
-      ],
-      "total_timeline": "N/A",
-      "summary": ""
-    }
-  },
   "565a9794e0e21d63bab1aea7f7f663170278c6f86cfacd092ecf8b20d9513adf": {
-    "timestamp": 1773764143.0529459,
+    "timestamp": 1773769101.1107163,
     "data": {
       "recommended_path": [
         {
           "order": 1,
-          "course_id": "C004",
-          "course_title": "Process Safety Management (PSM) for Engineers",
-          "provider": "Petroskills",
-          "url": "https://www.petroskills.com/course/psm-essentials",
-          "duration": "4 weeks",
+          "course_id": "C010",
+          "course_title": "Project Management Professional (PMP) Certification Prep",
+          "provider": "Coursera \u2013 Google",
+          "url": "https://www.coursera.org/pmp-prep",
+          "duration": "6 months",
           "skills_addressed": [
-            "Process Safety Management",
+            "Stakeholder Management",
             "Risk Assessment",
-            "HAZOP"
+            "Project Management"
           ],
-          "why_relevant": "Covers Risk Assessment gap."
+          "why_relevant": "Recommended based on skill gap match (AI engine unavailable)"
         },
         {
           "order": 2,
@@ -230,181 +26,27 @@
           "duration": "4 weeks",
           "skills_addressed": [
             "Stakeholder Management",
-            "Project Management",
-            "Crisis Management"
+            "Project Management"
           ],
-          "why_relevant": "Covers Stakeholder Management gap."
+          "why_relevant": "Recommended based on skill gap match (AI engine unavailable)"
         },
         {
           "order": 3,
-          "course_id": "C017",
-          "course_title": "Contract Management in Energy Capital Projects",
-          "provider": "LinkedIn Learning",
-          "url": "https://www.linkedin.com/learning/energy-contract-mgmt",
-          "duration": "5 weeks",
-          "skills_addressed": [
-            "Contract Management",
-            "Project Management",
-            "Regulatory Compliance"
-          ],
-          "why_relevant": "Covers Budgeting & Finance and Project Management gaps."
-        }
-      ],
-      "total_timeline": "N/A",
-      "summary": ""
-    }
-  },
-  "3d1ab9b2f1078e8a6e2abf94251c003e93d4d8ed220a6766c5dc9180b49d5304": {
-    "timestamp": 1773764183.3505588,
-    "data": {
-      "recommended_path": [
-        {
-          "order": 1,
-          "course_id": "C004",
-          "course_title": "Process Safety Management (PSM) for Engineers",
+          "course_id": "C013",
+          "course_title": "Refining Turnaround & Maintenance Management",
           "provider": "Petroskills",
-          "url": "https://www.petroskills.com/course/psm-essentials",
-          "duration": "4 weeks",
-          "skills_addressed": [
-            "Process Safety Management",
-            "Risk Assessment",
-            "HAZOP"
-          ],
-          "why_relevant": "Process Safety Management gap: 0->4"
-        },
-        {
-          "order": 2,
-          "course_id": "C017",
-          "course_title": "Contract Management in Energy Capital Projects",
-          "provider": "LinkedIn Learning",
-          "url": "https://www.linkedin.com/learning/energy-contract-mgmt",
-          "duration": "5 weeks",
-          "skills_addressed": [
-            "Contract Management",
-            "Project Management",
-            "Regulatory Compliance"
-          ],
-          "why_relevant": "Contract Management gap: 0->4"
-        },
-        {
-          "order": 3,
-          "course_id": "C024",
-          "course_title": "Drilling & Well Construction Mastery",
-          "provider": "Petroskills",
-          "url": "https://www.petroskills.com/course/drilling-mastery",
-          "duration": "4 months",
-          "skills_addressed": [
-            "Drilling Engineering",
-            "Well Completion",
-            "Process Safety Management"
-          ],
-          "why_relevant": "Drilling Engineering gap: 2->5"
-        }
-      ],
-      "total_timeline": "N/A",
-      "summary": ""
-    }
-  },
-  "d4d98f0a3262e02a69240e3dcd744a7a444be632244402eb1a966a94b5786407": {
-    "timestamp": 1773765561.320876,
-    "data": {
-      "recommended_path": [
-        {
-          "order": 1,
-          "course_id": "C006",
-          "course_title": "Refinery Process Optimization & Control",
-          "provider": "IHRDC",
-          "url": "https://www.ihrdc.com/refinery-optimization",
-          "duration": "10 weeks",
-          "skills_addressed": [
-            "Refinery Process Control",
-            "Plant Operations",
-            "Data Analytics"
-          ],
-          "why_relevant": "LNG Operations gap"
-        },
-        {
-          "order": 2,
-          "course_id": "C025",
-          "course_title": "Regulatory Compliance & Environmental Law (Malaysia focus)",
-          "provider": "UTP Executive Education",
-          "url": "https://www.utp.edu.my/exec-ed/environmental-law",
-          "duration": "4 weeks",
-          "skills_addressed": [
-            "Regulatory Compliance",
-            "HSSE Compliance",
-            "Stakeholder Management"
-          ],
-          "why_relevant": "Stakeholder Management gap"
-        },
-        {
-          "order": 3,
-          "course_id": "C004",
-          "course_title": "Process Safety Management (PSM) for Engineers",
-          "provider": "Petroskills",
-          "url": "https://www.petroskills.com/course/psm-essentials",
-          "duration": "4 weeks",
-          "skills_addressed": [
-            "Process Safety Management",
-            "Risk Assessment",
-            "HAZOP"
-          ],
-          "why_relevant": "Plant Operations gap"
-        }
-      ],
-      "total_timeline": "N/A",
-      "summary": ""
-    }
-  },
-  "487f886e9b4a36fea827c042858993a577203ffe4413a09bb68c9c3d576565fa": {
-    "timestamp": 1773765936.2741637,
-    "data": {
-      "recommended_path": [
-        {
-          "order": 1,
-          "course_id": "C004",
-          "course_title": "Process Safety Management (PSM) for Engineers",
-          "provider": "Petroskills",
-          "url": "https://www.petroskills.com/course/psm-essentials",
-          "duration": "4 weeks",
-          "skills_addressed": [
-            "Process Safety Management",
-            "Risk Assessment",
-            "HAZOP"
-          ],
-          "why_relevant": "Process Safety Management gap"
-        },
-        {
-          "order": 2,
-          "course_id": "C020",
-          "course_title": "Incident Investigation & Root Cause Analysis",
-          "provider": "OPITO",
-          "url": "https://www.opito.com/root-cause-analysis",
-          "duration": "4 weeks",
-          "skills_addressed": [
-            "Incident Investigation",
-            "Risk Assessment",
-            "HSE Management"
-          ],
-          "why_relevant": "Incident Investigation gap"
-        },
-        {
-          "order": 3,
-          "course_id": "C021",
-          "course_title": "Crisis Management & Communication in Energy",
-          "provider": "edX",
-          "url": "https://www.edx.org/course/energy-crisis-mgmt",
+          "url": "https://www.petroskills.com/turnaround-mgmt",
           "duration": "6 weeks",
           "skills_addressed": [
-            "Crisis Management",
-            "Stakeholder Management",
-            "HSE Management"
+            "SAP ERP",
+            "Turnaround Management"
           ],
-          "why_relevant": "Crisis Management gap"
+          "why_relevant": "Recommended based on skill gap match (AI engine unavailable)"
         }
       ],
-      "total_timeline": "3 months",
-      "summary": "Focus on technical gaps."
+      "total_timeline": "Flexible",
+      "summary": "Courses selected automatically based on skill gap overlap. AI engine was unavailable.",
+      "source": "fallback"
     }
   }
 }
