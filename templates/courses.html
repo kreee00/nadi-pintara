@@ -27,6 +27,7 @@
   <div class="nav-links">
     <a href="/dashboard"    class="nav-link">My Dashboard</a>
     <a href="/courses-page" class="nav-link active">Course Catalogue</a>
+    <a href="/hr-dashboard" class="nav-link" id="hrNavLink" style="display:none;">HR Analytics</a>
   </div>
 
   <div class="nav-right">
@@ -283,7 +284,7 @@ const FALLBACK_COURSES = [
 // Init
 loadCourses();
 
-// Show logged-in user initials
+// Show logged-in user initials + reveal HR Analytics link if HR
 (async () => {
   const id = localStorage.getItem('nadipintara_employee_id');
   if (!id) return;
@@ -292,6 +293,7 @@ loadCourses();
     const emp = await res.json();
     const initials = emp.name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
     document.getElementById('navAvatar').textContent = initials;
+    if (emp.is_hr) document.getElementById('hrNavLink').style.display = '';
   } catch {}
 })();
 </script>

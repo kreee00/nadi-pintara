@@ -32,6 +32,7 @@
   <div class="nav-links">
     <a href="/dashboard"    class="nav-link active">My Dashboard</a>
     <a href="/courses-page" class="nav-link">Course Catalogue</a>
+    <a href="/hr-dashboard" class="nav-link" id="hrNavLink" style="display:none;">HR Analytics</a>
   </div>
 
   <div class="nav-right">
@@ -471,6 +472,7 @@ function renderPhase1(data) {
   const initials = emp.name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
   document.getElementById('navAvatar').textContent = initials;
   document.getElementById('navName').textContent   = emp.name.split(' ')[0];
+  if (emp.is_hr) document.getElementById('hrNavLink').style.display = '';
   document.getElementById('heroGreeting').textContent = `Welcome back, ${emp.name.split(' ')[0]}.`;
   document.getElementById('heroMeta').textContent  = 'Last analysed: ' + new Date().toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'});
 

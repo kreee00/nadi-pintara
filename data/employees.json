@@ -293,5 +293,23 @@
       "Regulatory Compliance": 4,
       "Crisis Management": 3
     }
+  },
+  {
+    "id": "E016",
+    "name": "Noor Haslinda binti Azman (HR)",
+    "department": "Corporate & Business",
+    "current_role": "HR Business Partner",
+    "target_role": "Project Manager (O&G)",
+    "years_experience": 9,
+    "education": "B.Sc Human Resource Management, UiTM Shah Alam",
+    "is_hr": true,
+    "current_skills": {
+      "Stakeholder Management": 4,
+      "Project Management": 3,
+      "Data Analytics": 2,
+      "Regulatory Compliance": 3,
+      "SAP ERP": 2,
+      "Contract Management": 2
+    }
   }
 ]

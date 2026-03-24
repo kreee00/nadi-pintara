@@ -7,10 +7,23 @@ import json
 import os
 from dotenv import load_dotenv
 
+import threading
+
 load_dotenv()
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 CORS(app)
+
+
+def _prewarm_analytics():
+    """Pre-compute analytics cache in background so the HR dashboard loads instantly."""
+    try:
+        from engine.analytics import get_or_compute_analytics
+        get_or_compute_analytics()
+    except Exception:
+        pass  # Non-critical; dashboard will compute on first request if needed
+
+threading.Thread(target=_prewarm_analytics, daemon=True).start()
 
 
 def load_json(path):
@@ -38,6 +51,11 @@ def dashboard():
 @app.route("/courses-page")
 def courses_page():
     return render_template("courses.html")
+
+
+@app.route("/hr-dashboard")
+def hr_dashboard():
+    return render_template("hr_dashboard.html")
 
 
 # ── Data API Routes ───────────────────────────────────────────────────────────
@@ -138,6 +156,28 @@ def chatbot_message():
 def chatbot_summarize():
     from engine.chatbot_engine import generate_assessment_summary
     return jsonify(generate_assessment_summary(request.json))
+
+
+# ── HR Analytics API ──────────────────────────────────────────────────────────
+
+@app.route("/api/analytics/workforce", methods=["GET"])
+def workforce_analytics():
+    from engine.analytics import get_or_compute_analytics
+    try:
+        data, _ = get_or_compute_analytics()
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/analytics/refresh", methods=["POST"])
+def refresh_analytics():
+    from engine.analytics import refresh_analytics_cache
+    try:
+        data = refresh_analytics_cache()
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # ── Health Check ──────────────────────────────────────────────────────────────
