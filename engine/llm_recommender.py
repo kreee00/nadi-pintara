@@ -3,11 +3,24 @@ llm_recommender.py
 Unified LLM interface for Nadi Pintara.
 
 Reads LLM_PROVIDER from .env and routes all calls to the correct backend.
-Supported providers:
-    gemini  — Google Gemini API (requires GEMINI_API_KEY)
-    ollama  — Local Ollama server (requires Ollama running on localhost)
 
-Usage (anywhere in the project):
+Supported providers
+───────────────────
+  gemini   — Google Gemini API
+               GEMINI_API_KEY  (or legacy AI_API_KEY)
+               GEMINI_MODEL    (default: gemini-2.5-flash)
+
+  openai   — OpenAI API or any OpenAI-compatible endpoint
+               OPENAI_API_KEY
+               OPENAI_MODEL    (default: gpt-4o-mini)
+               OPENAI_BASE_URL (optional — override for Groq, Together,
+                                Azure, Mistral, Perplexity, etc.)
+
+  ollama   — Local Ollama server (no API key needed)
+               OLLAMA_MODEL    (default: llama3.2:3b)
+               Ollama must be running on localhost:11434
+
+Usage:
     from engine.llm_recommender import get_recommendations, generate_summary
 """
 
@@ -22,14 +35,29 @@ load_dotenv(override=True)
 
 # ── Provider config ───────────────────────────────────────────────────────────
 
-PROVIDER     = os.getenv("LLM_PROVIDER", "gemini").lower().strip()
+PROVIDER = os.getenv("LLM_PROVIDER", "gemini").lower().strip()
+
+# Gemini
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-GEMINI_KEY   = os.getenv("GEMINI_API_KEY", "")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL",  "llama3.2:3b")
+GEMINI_KEY   = os.getenv("GEMINI_API_KEY") or os.getenv("AI_API_KEY", "")
+
+# OpenAI / OpenAI-compatible
+OPENAI_MODEL    = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_KEY      = os.getenv("OPENAI_API_KEY", "")
+OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "").strip()  # leave blank for OpenAI default
+
+# Ollama
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
 OLLAMA_URL   = "http://localhost:11434/api/generate"
 
-print(f"[LLM] Provider: {PROVIDER.upper()} | "
-      f"Model: {GEMINI_MODEL if PROVIDER == 'gemini' else OLLAMA_MODEL}")
+# Startup log
+if PROVIDER == "ollama":
+    print(f"[LLM] Provider: OLLAMA | Model: {OLLAMA_MODEL}")
+elif PROVIDER == "openai":
+    base_tag = f" | Base URL: {OPENAI_BASE_URL}" if OPENAI_BASE_URL else ""
+    print(f"[LLM] Provider: OPENAI | Model: {OPENAI_MODEL}{base_tag}")
+else:
+    print(f"[LLM] Provider: GEMINI | Model: {GEMINI_MODEL}")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -37,7 +65,7 @@ print(f"[LLM] Provider: {PROVIDER.upper()} | "
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def _call_gemini(prompt, retries=3, delay=5):
-    """Send prompt to Gemini API. Returns raw text or None on failure."""
+    """Send prompt to Google Gemini API. Returns raw text or None on failure."""
     try:
         from google import genai
         from google.genai import types
@@ -70,6 +98,48 @@ def _call_gemini(prompt, retries=3, delay=5):
                     return None
             else:
                 print(f"[Gemini] Error: {err}")
+                return None
+
+
+def _call_openai(prompt, retries=3, delay=5):
+    """
+    Send prompt to an OpenAI-compatible API.
+    Works with OpenAI, Groq, Together, Azure OpenAI, Mistral, Perplexity, etc.
+    Set OPENAI_BASE_URL in .env to point to a different provider's endpoint.
+    """
+    try:
+        from openai import OpenAI
+    except ImportError:
+        print("[OpenAI] 'openai' package not installed. Run: pip install openai")
+        return None
+
+    kwargs = {"api_key": OPENAI_KEY or "none"}
+    if OPENAI_BASE_URL:
+        kwargs["base_url"] = OPENAI_BASE_URL
+
+    client = OpenAI(**kwargs)
+
+    for attempt in range(retries):
+        try:
+            response = client.chat.completions.create(
+                model=OPENAI_MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                max_tokens=1024,
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            err = str(e)
+            if any(k in err.lower() for k in ("503", "rate", "overload", "unavailable")):
+                if attempt < retries - 1:
+                    print(f"[OpenAI] Busy, retrying in {delay}s... "
+                          f"(attempt {attempt + 1}/{retries})")
+                    time.sleep(delay)
+                else:
+                    print("[OpenAI] Still unavailable after retries.")
+                    return None
+            else:
+                print(f"[OpenAI] Error: {err}")
                 return None
 
 
@@ -113,6 +183,8 @@ def _ask(prompt):
     """Route prompt to the active provider. Returns raw text or None."""
     if PROVIDER == "ollama":
         return _call_ollama(prompt)
+    if PROVIDER == "openai":
+        return _call_openai(prompt)
     return _call_gemini(prompt)
 
 
@@ -122,8 +194,8 @@ def _ask(prompt):
 
 def _build_prompt(employee, skill_gaps, courses):
     """
-    Lean prompt shared by both providers.
-    LLM only needs to return course_id + why_relevant.
+    Lean prompt shared by all providers.
+    The LLM only needs to return course_id + why_relevant.
     Full course details are re-attached by _hydrate() after the call.
     """
     slim_courses = [
@@ -136,7 +208,7 @@ def _build_prompt(employee, skill_gaps, courses):
         for s, d in top_3_gaps
     ]
 
-    # Ollama benefits from a concrete few-shot example
+    # Ollama small models benefit from a concrete few-shot example
     example = (
         '\n\nExample Output:\n'
         '{"recommended_path": [{"order": 1, "course_id": "C001", '
@@ -146,7 +218,7 @@ def _build_prompt(employee, skill_gaps, courses):
     )
 
     return (
-        f"Task: Pick 3 courses for this PETRONAS employee.\n"
+        f"Task: Pick 3 courses for this employee.\n"
         f"Employee: {employee['current_role']} -> {employee['target_role']}\n"
         f"Gaps: {', '.join(gap_strings)}\n\n"
         f"Courses:\n{json.dumps(slim_courses)}"
@@ -183,7 +255,7 @@ def _parse(text):
 def _hydrate(parsed, courses):
     """
     Re-attach full course details to the slim LLM output.
-    LLM returns only course_id + why_relevant to save tokens.
+    The LLM returns only course_id + why_relevant to save tokens.
     This function adds title, provider, url, duration, skills_addressed.
     """
     course_map = {c["id"]: c for c in courses}
@@ -235,10 +307,7 @@ def _fallback(skill_gaps, courses):
                 "url":              c["url"],
                 "duration":         c["duration"],
                 "skills_addressed": list(set(c["skills_covered"]) & gap_skills),
-                "why_relevant":     (
-                    "Recommended based on skill gap match "
-                    "(AI engine unavailable)"
-                ),
+                "why_relevant":     "Recommended based on skill gap match (AI unavailable)",
             }
             for i, c in enumerate(top_3)
         ],
@@ -291,7 +360,6 @@ def generate_summary(employee_name, current_role, target_role, assessed_skills):
     if not raw:
         return None
 
-    # Strip any JSON wrapper the model may have added
     raw = re.sub(r"```json|```", "", raw).strip()
     try:
         obj = json.loads(raw)

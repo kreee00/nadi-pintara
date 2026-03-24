@@ -45,17 +45,18 @@ def strip_ansi(s):
 
 def detect_provider():
     """
-    Reads LLM_PROVIDER from .env and returns a dict with:
-      - provider : "gemini" | "ollama"
-      - label    : display name e.g. "Gemini 2.5 Flash"
-      - model    : model string
-      - endpoint : API endpoint URL
-      - key_set  : True if API key is present (for cloud providers)
+    Reads LLM_PROVIDER from .env and returns a display info dict.
+
+    Supported values for LLM_PROVIDER:
+      gemini  — Google Gemini  (GEMINI_API_KEY or AI_API_KEY, GEMINI_MODEL)
+      openai  — OpenAI or any OpenAI-compatible API
+                (OPENAI_API_KEY, OPENAI_MODEL, optional OPENAI_BASE_URL)
+      ollama  — Local Ollama server  (OLLAMA_MODEL, no key needed)
     """
     provider = os.getenv("LLM_PROVIDER", "gemini").lower().strip()
 
     if provider == "ollama":
-        model    = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+        model = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
         return {
             "provider": "ollama",
             "label":    f"Ollama  ({model})",
@@ -65,9 +66,22 @@ def detect_provider():
             "color_fn": teal,
         }
 
+    if provider == "openai":
+        model    = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        api_key  = os.getenv("OPENAI_API_KEY", "")
+        base_url = os.getenv("OPENAI_BASE_URL", "").strip() or "https://api.openai.com/v1"
+        return {
+            "provider": "openai",
+            "label":    f"OpenAI-compatible  ({model})",
+            "model":    model,
+            "endpoint": base_url,
+            "key_set":  bool(api_key),
+            "color_fn": green,
+        }
+
     # Default: Gemini
     model   = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-    api_key = os.getenv("GEMINI_API_KEY", "")
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("AI_API_KEY", "")
     return {
         "provider": "gemini",
         "label":    f"Google Gemini  ({model})",
@@ -241,14 +255,15 @@ def show_provider_box(pinfo):
     if pinfo["provider"] == "ollama":
         note(f"Mode      :  {teal('Local  (no API key needed, no internet)')}", indent=2)
     else:
+        key_var = "OPENAI_API_KEY" if pinfo["provider"] == "openai" else "GEMINI_API_KEY"
         key_status = (green("✔  API key loaded") if pinfo["key_set"]
-                      else red("✘  GEMINI_API_KEY not set in .env"))
+                      else red(f"✘  {key_var} not set in .env"))
         note(f"API Key   :  {key_status}", indent=2)
 
         if not pinfo["key_set"]:
             blank()
             note(red("⚠  Cloud provider selected but no API key found."), indent=2)
-            note(dim("   Add GEMINI_API_KEY=your_key to your .env file."), indent=2)
+            note(dim(f"   Add {key_var}=your_key to your .env file."), indent=2)
             note(dim("   Or switch to LLM_PROVIDER=ollama in .env."), indent=2)
             blank()
             note(dim("   Continuing — will use fallback if API call fails."), indent=2)

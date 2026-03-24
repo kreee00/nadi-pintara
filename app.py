@@ -184,12 +184,23 @@ def refresh_analytics():
 
 @app.route("/health", methods=["GET"])
 def health():
-    import os
-    provider = os.getenv("LLM_PROVIDER", "gemini").upper()
+    provider = os.getenv("LLM_PROVIDER", "gemini").lower()
+    if provider == "openai":
+        model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        base  = os.getenv("OPENAI_BASE_URL", "").strip() or "https://api.openai.com/v1"
+    elif provider == "ollama":
+        model = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+        base  = "http://localhost:11434"
+    else:
+        provider = "gemini"
+        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        base  = "https://generativelanguage.googleapis.com"
     return jsonify({
-        "status": "ok",
-        "message": "Nadi Pintara API is running",
-        "llm_provider": provider
+        "status":       "ok",
+        "message":      "Nadi Pintara API is running",
+        "llm_provider": provider.upper(),
+        "llm_model":    model,
+        "llm_endpoint": base,
     })
 
 

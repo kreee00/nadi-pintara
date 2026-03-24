@@ -2,7 +2,7 @@
 Chatbot Engine — hardcoded skill assessment questions + AI summary.
 Pure Python scoring (no LLM per question). One LLM call at the end.
 
-Provider is read from .env (LLM_PROVIDER=gemini or ollama).
+Provider is read from .env (LLM_PROVIDER = gemini | openai | ollama).
 """
 
 import os
