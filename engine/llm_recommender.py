@@ -125,7 +125,7 @@ def _call_openai(prompt, retries=3, delay=5):
                 model=OPENAI_MODEL,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.1,
-                max_tokens=1024,
+                max_completion_tokens=1024,
             )
             return response.choices[0].message.content
         except Exception as e:
