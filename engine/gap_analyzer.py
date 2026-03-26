@@ -29,19 +29,18 @@ def calculate_skill_gap(employee, roles_data):
     return gaps, None
 
 def prefilter_courses(skill_gaps, courses, max_courses=8):
-    """
-    Return only courses that cover at least one skill in the gap list.
-    Sorted by how many gaps they address (most relevant first).
-    """
     gap_skills = set(skill_gaps.keys())
+    # Weight by gap severity, not just count
+    gap_weights = {skill: info["gap"] for skill, info in skill_gaps.items()}
     scored = []
 
     for course in courses:
         skills_covered = set(course.get("skills_covered", []))
-        overlap = len(gap_skills & skills_covered)
-        if overlap > 0:
-            scored.append((overlap, course))
+        overlap = gap_skills & skills_covered
+        if overlap:
+            # Score = sum of gap severity for matched skills
+            weight = sum(gap_weights.get(s, 0) for s in overlap)
+            scored.append((weight, course))
 
-    # Sort by overlap score descending, take top max_courses
     scored.sort(key=lambda x: x[0], reverse=True)
     return [course for _, course in scored[:max_courses]]
