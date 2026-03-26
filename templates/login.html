@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nadi Pintara — Login</title>
+  <script>(function(){var t=localStorage.getItem('np-theme');var d=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(t===null&&d))document.documentElement.classList.add('dark');}());</script>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <style>
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-page);
+    }
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow-lg);
+    }
+    .login-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .login-brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--teal), var(--navy));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-brand-text {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .login-brand-text span:first-child { color: var(--teal); }
+    .login-brand-text span:last-child  { color: var(--navy); }
+    .login-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 6px;
+    }
+    .login-sub {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-bottom: 28px;
+    }
+    .login-form-group {
+      margin-bottom: 20px;
+    }
+    .login-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-2);
+      margin-bottom: 8px;
+    }
+    .login-select-wrap {
+      position: relative;
+    }
+    .login-select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+      font-size: 13px;
+    }
+    .login-select {
+      width: 100%;
+      padding: 11px 36px 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-input, var(--bg-page));
+      color: var(--text-1);
+      font-size: 14px;
+      font-family: inherit;
+      appearance: none;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .login-select:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+    .login-employee-preview {
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: var(--teal-light, rgba(0,161,156,0.08));
+      border-radius: var(--radius);
+      font-size: 13px;
+      color: var(--text-2);
+      display: none;
+    }
+    .login-employee-preview.show { display: block; }
+    .preview-name { font-weight: 700; color: var(--text-1); font-size: 14px; margin-bottom: 4px; }
+    .preview-meta { color: var(--text-3); font-size: 12px; }
+    .login-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .login-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .login-note {
+      margin-top: 18px;
+      font-size: 11px;
+      color: var(--text-3);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<div class="login-page">
+  <div class="login-card">
+
+    <div class="login-brand">
+      <div class="login-brand-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 2C9 2 4 5.5 4 10C4 12.76 6.24 15 9 15C11.76 15 14 12.76 14 10C14 5.5 9 2 9 2Z" fill="white" opacity="0.9"/>
+          <circle cx="9" cy="10" r="2.5" fill="white"/>
+        </svg>
+      </div>
+      <div class="login-brand-text">
+        <span>nadi</span><span>pintara</span>
+      </div>
+    </div>
+
+    <div class="login-title">Welcome back</div>
+    <div class="login-sub">Select your employee profile to continue.</div>
+
+    <div class="login-form-group">
+      <label class="login-label">Select Employee</label>
+      <div class="login-select-wrap">
+        <select class="login-select" id="employeeSelect" onchange="onEmployeeChange()">
+          <option value="">— Select your name —</option>
+        </select>
+      </div>
+      <div class="login-employee-preview" id="employeePreview">
+        <div class="preview-name" id="previewName"></div>
+        <div class="preview-meta" id="previewMeta"></div>
+      </div>
+    </div>
+
+    <button class="login-btn" id="loginBtn" onclick="doLogin()" disabled>
+      Login →
+    </button>
+
+    <div class="login-note">Prototype mode — no password required</div>
+
+  </div>
+</div>
+
+<script src="/static/js/main.js"></script>
+<script>
+let employees = [];
+
+async function loadEmployees() {
+  try {
+    const res = await fetch('/employees');
+    employees = await res.json();
+    const select = document.getElementById('employeeSelect');
+    employees.forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.id;
+      opt.textContent = e.name;
+      select.appendChild(opt);
+    });
+  } catch {
+    showToast('❌', 'Could not load employees. Is Flask running?');
+  }
+}
+
+function onEmployeeChange() {
+  const id = document.getElementById('employeeSelect').value;
+  const emp = employees.find(e => e.id === id);
+  const preview = document.getElementById('employeePreview');
+  const btn = document.getElementById('loginBtn');
+
+  if (!emp) {
+    preview.classList.remove('show');
+    btn.disabled = true;
+    return;
+  }
+
+  document.getElementById('previewName').textContent = emp.name;
+  document.getElementById('previewMeta').textContent =
+    `${emp.current_role}  ·  ${emp.department}  ·  ${emp.years_experience} yrs exp`;
+  preview.classList.add('show');
+  btn.disabled = false;
+}
+
+function doLogin() {
+  const id = document.getElementById('employeeSelect').value;
+  if (!id) return;
+  localStorage.setItem('nadipintara_employee_id', id);
+  window.location.href = '/dashboard';
+}
+
+loadEmployees();
+</script>
+</body>
+</html>

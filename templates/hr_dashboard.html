@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nadi Pintara — HR Analytics</title>
+  <script>(function(){var t=localStorage.getItem('np-theme');var d=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(t===null&&d))document.documentElement.classList.add('dark');}());</script>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ── HR Dashboard layout ──────────────────────────────────── */
+    .hr-hero {
+      background: linear-gradient(135deg, var(--navy) 0%, #004b99 60%, var(--teal-dark) 100%);
+      padding: 36px 0 32px;
+      margin-top: var(--nav-h);
+      margin-bottom: 32px;
+    }
+    .hr-hero-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .hr-hero-title { font-size: 26px; font-weight: 700; color: white; margin-bottom: 4px; }
+    .hr-hero-sub   { font-size: 13px; color: rgba(255,255,255,0.7); }
+
+    .hr-hero-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .cache-badge {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.85);
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      white-space: nowrap;
+    }
+    .btn-refresh {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .btn-refresh:hover:not(:disabled) {
+      background: rgba(255,255,255,0.28);
+    }
+    .btn-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-refresh svg { transition: transform 0.6s ease; }
+    .btn-refresh.spinning svg { animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── KPI cards ──────────────────────────────────────────────── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+    }
+    .kpi-label { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+    .kpi-value { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+    .kpi-sub   { font-size: 12px; color: var(--text-3); }
+    .kpi-value.teal { color: var(--teal); }
+    .kpi-value.gold { color: var(--gold); }
+    .kpi-value.navy { color: var(--navy); }
+    html.dark .kpi-value.navy { color: #5b9bd5; }
+    .kpi-value.warn { color: #E57373; }
+
+    /* ── Grid layouts ───────────────────────────────────────────── */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .analytics-grid.wide { grid-template-columns: 2fr 1fr; }
+    @media (max-width: 860px) {
+      .analytics-grid, .analytics-grid.wide { grid-template-columns: 1fr; }
+    }
+
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .chart-title    { font-size: 14px; font-weight: 600; color: var(--text-1); margin-bottom: 4px; }
+    .chart-subtitle { font-size: 12px; color: var(--text-3); margin-bottom: 20px; }
+
+    /* ── Department table ───────────────────────────────────────── */
+    .dept-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .dept-table th {
+      text-align: left; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .04em;
+      color: var(--text-3); padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    .dept-table td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text-1); vertical-align: top; }
+    .dept-table tr:last-child td { border-bottom: none; }
+    .dept-table tr:hover td { background: var(--surface-2); }
+
+    .readiness-bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .readiness-bar-bg   { flex: 1; height: 6px; background: var(--surface-3); border-radius: var(--radius-pill); overflow: hidden; }
+    .readiness-bar-fill { height: 100%; border-radius: var(--radius-pill); }
+    .readiness-val      { font-size: 12px; font-weight: 600; width: 38px; text-align: right; }
+
+    /* ── Employee table ─────────────────────────────────────────── */
+    .emp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .emp-table th {
+      text-align: left; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .04em;
+      color: var(--text-3); padding: 8px 12px; border-bottom: 1px solid var(--border);
+    }
+    .emp-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text-1); }
+    .emp-table tr:last-child td { border-bottom: none; }
+    .emp-table tr:hover td { background: var(--surface-2); }
+
+    .badge-dept { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: var(--radius-pill); white-space: nowrap; }
+    .badge-dept.upstream   { background: rgba(0,161,156,0.12); color: var(--teal); }
+    .badge-dept.downstream { background: rgba(245,166,35,0.12); color: var(--gold); }
+    .badge-dept.technical  { background: rgba(0,48,135,0.10); color: var(--navy); }
+    html.dark .badge-dept.technical { background: rgba(91,155,213,0.15); color: #5b9bd5; }
+    .badge-dept.corporate  { background: rgba(229,115,115,0.12); color: #E57373; }
+
+    .readiness-pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: var(--radius-pill); }
+    .readiness-pill.high   { background: rgba(0,161,156,0.12); color: var(--teal); }
+    .readiness-pill.medium { background: rgba(245,166,35,0.12); color: var(--gold); }
+    .readiness-pill.low    { background: rgba(229,115,115,0.12); color: #E57373; }
+
+    /* ── Training alignment ─────────────────────────────────────── */
+    .training-list { display: flex; flex-direction: column; gap: 12px; }
+    .training-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px; background: var(--surface-2); border-radius: var(--radius-md); border: 1px solid var(--border); }
+    .training-rank { min-width: 28px; height: 28px; border-radius: 50%; background: var(--teal); color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .training-title { font-size: 13px; font-weight: 600; color: var(--text-1); margin-bottom: 3px; }
+    .training-meta  { font-size: 11px; color: var(--text-3); margin-bottom: 6px; }
+    .training-tags  { display: flex; flex-wrap: wrap; gap: 4px; }
+    .training-tag   { font-size: 10px; padding: 2px 7px; border-radius: var(--radius-pill); background: var(--teal-light); color: var(--teal); font-weight: 500; }
+
+    /* ── Section header ─────────────────────────────────────────── */
+    .section-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; }
+    .section-title  { font-size: 16px; font-weight: 700; color: var(--text-1); }
+    .section-count  { font-size: 12px; color: var(--text-3); }
+
+    .full-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    /* ── Access denied overlay ──────────────────────────────────── */
+    #accessDenied {
+      display: none;
+      position: fixed; inset: 0;
+      background: var(--bg);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+      padding: 32px;
+    }
+    #accessDenied.show { display: flex; }
+    .denied-icon { font-size: 48px; }
+    .denied-title { font-size: 22px; font-weight: 700; color: var(--text-1); }
+    .denied-sub   { font-size: 14px; color: var(--text-3); max-width: 320px; }
+    .denied-btn   {
+      margin-top: 8px; padding: 10px 28px;
+      background: var(--teal); color: white;
+      border: none; border-radius: var(--radius-pill);
+      font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ── Skeleton ───────────────────────────────────────────────── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: var(--radius-sm);
+      color: transparent !important;
+      pointer-events: none;
+      user-select: none;
+      min-height: 36px;
+      min-width: 60px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  </style>
+</head>
+<body>
+
+<div id="top-progress"></div>
+<div id="toast-container"></div>
+
+<!-- Access Denied overlay (shown if not HR) -->
+<div id="accessDenied">
+  <div class="denied-icon">🔒</div>
+  <div class="denied-title">Access Restricted</div>
+  <div class="denied-sub">The HR Analytics Dashboard is only accessible to HR personnel.</div>
+  <button class="denied-btn" onclick="window.location.href='/dashboard'">Back to My Dashboard</button>
+</div>
+
+<!-- ═══ NAVBAR ═══════════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-brand-icon">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2C9 2 4 5.5 4 10C4 12.76 6.24 15 9 15C11.76 15 14 12.76 14 10C14 5.5 9 2 9 2Z" fill="white" opacity="0.9"/>
+        <circle cx="9" cy="10" r="2.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="nav-brand-text"><span>nadi</span><span>pintara</span></div>
+  </div>
+
+  <div class="nav-links">
+    <a href="/dashboard"    class="nav-link">My Dashboard</a>
+    <a href="/courses-page" class="nav-link">Course Catalogue</a>
+    <a href="/hr-dashboard" class="nav-link active">HR Analytics</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="dark-toggle" id="darkToggle" title="Toggle dark mode">
+      <span class="dark-toggle-icon sun">☀</span>
+      <span class="dark-toggle-icon moon">☽</span>
+    </button>
+    <span class="nav-name" id="navName">—</span>
+    <div class="nav-avatar" id="navAvatar">—</div>
+    <a href="/login" onclick="localStorage.removeItem('nadipintara_employee_id')"
+       style="font-size:12px;color:var(--text-3);text-decoration:none;margin-left:4px;"
+       title="Switch user">↩</a>
+  </div>
+</nav>
+
+<!-- ═══ HR HERO ════════════════════════════════════════════ -->
+<div class="hr-hero">
+  <div class="hr-hero-inner">
+    <div>
+      <div class="hr-hero-title">HR Analytics Dashboard</div>
+      <div class="hr-hero-sub">Workforce capability overview &amp; learning investment insights</div>
+    </div>
+    <div class="hr-hero-actions">
+      <div class="cache-badge" id="cacheBadge">Loading data…</div>
+      <button class="btn-refresh" id="refreshBtn" onclick="triggerRefresh()" title="Re-run analytics engine with latest employee data">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M11 6.5A4.5 4.5 0 1 1 6.5 2M6.5 2L9 4.5M6.5 2L4 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Refresh Data
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ══════════════════════════════════════════════ -->
+<main class="page-wrapper" style="padding-top:0; margin-top:0;">
+<div class="container">
+
+  <!-- KPI row -->
+  <div class="kpi-grid fade-up">
+    <div class="kpi-card">
+      <div class="kpi-label">Employees Tracked</div>
+      <div class="kpi-value navy skeleton" id="kpiTotal"> </div>
+      <div class="kpi-sub" id="kpiTotalSub"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Avg Readiness</div>
+      <div class="kpi-value teal skeleton" id="kpiReadiness"> </div>
+      <div class="kpi-sub" id="kpiReadinessSub"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Fully Ready</div>
+      <div class="kpi-value gold skeleton" id="kpiReady"> </div>
+      <div class="kpi-sub" id="kpiReadySub"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Skill Gaps</div>
+      <div class="kpi-value warn skeleton" id="kpiGaps"> </div>
+      <div class="kpi-sub" id="kpiGapsSub"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Avg Gaps / Person</div>
+      <div class="kpi-value skeleton" id="kpiAvgGaps"> </div>
+      <div class="kpi-sub">skill gaps per employee</div>
+    </div>
+  </div>
+
+  <!-- Charts row 1 -->
+  <div class="analytics-grid fade-up">
+    <div class="chart-card">
+      <div class="chart-title">Top Skill Gaps Across Workforce</div>
+      <div class="chart-subtitle">Skills with the highest aggregate gap score — colour indicates severity</div>
+      <canvas id="chartSkillGaps" height="280"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Workforce Readiness Distribution</div>
+      <div class="chart-subtitle">Employees by readiness band (High ≥80%, Medium 50–79%, Low &lt;50%)</div>
+      <div style="max-width:300px;margin:0 auto;">
+        <canvas id="chartReadiness" height="260"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts row 2 -->
+  <div class="analytics-grid fade-up">
+    <div class="chart-card">
+      <div class="chart-title">Avg Readiness by Department</div>
+      <div class="chart-subtitle">How prepared each department is for target roles</div>
+      <canvas id="chartDeptReadiness" height="220"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Readiness by Target Role</div>
+      <div class="chart-subtitle">Average employee readiness per career target</div>
+      <canvas id="chartRoleReadiness" height="220"></canvas>
+    </div>
+  </div>
+
+  <!-- Department breakdown table -->
+  <div class="full-card fade-up">
+    <div class="section-header">
+      <div class="section-title">Department Breakdown</div>
+      <div class="section-count" id="deptCount"></div>
+    </div>
+    <table class="dept-table">
+      <thead>
+        <tr>
+          <th>Department</th>
+          <th>Employees</th>
+          <th>Avg Readiness</th>
+          <th>Top Skill Gaps</th>
+        </tr>
+      </thead>
+      <tbody id="deptTableBody">
+        <tr><td colspan="4" style="color:var(--text-3);padding:20px 12px;">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Training alignment + Employee table -->
+  <div class="analytics-grid wide fade-up">
+    <div class="chart-card">
+      <div class="section-header" style="margin-bottom:12px;">
+        <div class="section-title">Training Investment Alignment</div>
+        <div class="section-count">courses addressing the most critical skill gaps</div>
+      </div>
+      <div class="training-list" id="trainingList">
+        <div style="color:var(--text-3);font-size:13px;">Loading…</div>
+      </div>
+    </div>
+    <div class="chart-card" style="overflow-x:auto;">
+      <div class="section-header" style="margin-bottom:12px;">
+        <div class="section-title">Employee Readiness</div>
+        <div class="section-count" id="empCount"></div>
+      </div>
+      <table class="emp-table">
+        <thead>
+          <tr><th>Name</th><th>Dept</th><th>Gaps</th><th>Readiness</th></tr>
+        </thead>
+        <tbody id="empTableBody">
+          <tr><td colspan="4" style="color:var(--text-3);">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<script src="/static/js/main.js"></script>
+<script>
+(function () {
+
+  // ── RBAC: verify current user is HR before rendering ────────────────────
+  async function checkHRAccess() {
+    const employeeId = localStorage.getItem('nadipintara_employee_id');
+    if (!employeeId) {
+      showAccessDenied();
+      return false;
+    }
+    try {
+      const res = await fetch(`/employee/${employeeId}`);
+      if (!res.ok) { showAccessDenied(); return false; }
+      const emp = await res.json();
+      if (!emp.is_hr) { showAccessDenied(); return false; }
+      // Populate navbar
+      const initials = emp.name.replace(/\s*\(HR\)\s*$/i, '').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('navAvatar').textContent = initials;
+      document.getElementById('navName').textContent   = emp.name.split(' ')[0];
+      return true;
+    } catch {
+      showAccessDenied();
+      return false;
+    }
+  }
+
+  function showAccessDenied() {
+    document.getElementById('accessDenied').classList.add('show');
+  }
+
+  // ── Chart registry (needed for theme switching) ──────────────────────────
+  window._charts = {};
+
+  function isDark() { return document.documentElement.classList.contains('dark'); }
+
+  function chartColors() {
+    return {
+      text:  isDark() ? '#9AABB8' : '#4A5568',
+      grid:  isDark() ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+    };
+  }
+
+  function reapplyTheme() {
+    Object.values(window._charts).forEach(chart => {
+      const c = chartColors();
+      if (chart.options.scales) {
+        Object.values(chart.options.scales).forEach(axis => {
+          if (axis.ticks) axis.ticks.color = c.text;
+          if (axis.grid)  axis.grid.color  = c.grid;
+        });
+      }
+      if (chart.options.plugins?.legend?.labels) {
+        chart.options.plugins.legend.labels.color = c.text;
+      }
+      chart.update();
+    });
+  }
+
+  document.getElementById('darkToggle')?.addEventListener('click', () => {
+    const isDarkNow = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('np-theme', isDarkNow ? 'dark' : 'light');
+    reapplyTheme();
+  });
+
+  // ── Colour helpers ───────────────────────────────────────────────────────
+  function readinessColor(pct) {
+    if (pct >= 80) return '#00A19C';
+    if (pct >= 50) return '#F5A623';
+    return '#E57373';
+  }
+  function readinessClass(pct) {
+    if (pct >= 80) return 'high';
+    if (pct >= 50) return 'medium';
+    return 'low';
+  }
+  function deptBadgeClass(dept) {
+    if (dept.startsWith('Upstream'))   return 'upstream';
+    if (dept.startsWith('Downstream')) return 'downstream';
+    if (dept.startsWith('Technical'))  return 'technical';
+    return 'corporate';
+  }
+
+  // ── Cache badge ──────────────────────────────────────────────────────────
+  function updateCacheBadge(cachedAt) {
+    const badge = document.getElementById('cacheBadge');
+    if (!cachedAt) { badge.textContent = 'Live data'; return; }
+    const ageMin = Math.round((Date.now() / 1000 - cachedAt) / 60);
+    if (ageMin < 1)  { badge.textContent = 'Updated just now'; return; }
+    if (ageMin < 60) { badge.textContent = `Data from ${ageMin}m ago`; return; }
+    const ageHr = Math.round(ageMin / 60);
+    badge.textContent = `Data from ${ageHr}h ago`;
+  }
+
+  // ── Chart builders ───────────────────────────────────────────────────────
+  function destroyChart(key) {
+    if (window._charts[key]) { window._charts[key].destroy(); delete window._charts[key]; }
+  }
+
+  function buildSkillGapsChart(skillGaps) {
+    destroyChart('skillGaps');
+    const top = skillGaps.slice(0, 10);
+    const c   = chartColors();
+    window._charts.skillGaps = new Chart(
+      document.getElementById('chartSkillGaps').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: top.map(s => s.skill),
+          datasets: [{
+            label: 'Total Gap Score',
+            data:  top.map(s => s.total_gap),
+            backgroundColor: top.map(s =>
+              s.employees_affected >= 5 ? 'rgba(229,115,115,0.75)'
+              : s.employees_affected >= 3 ? 'rgba(245,166,35,0.75)'
+              : 'rgba(0,161,156,0.65)'
+            ),
+            borderRadius: 4, borderSkipped: false,
+          }],
+        },
+        options: {
+          indexAxis: 'y', responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { afterLabel: ctx => {
+              const item = top[ctx.dataIndex];
+              return `Affects ${item.employees_affected} employee(s)  ·  Avg gap: ${item.avg_gap}`;
+            }}},
+          },
+          scales: {
+            x: { grid: { color: c.grid }, ticks: { color: c.text, font: { size: 11 } } },
+            y: { grid: { display: false }, ticks: { color: c.text, font: { size: 11 } } },
+          },
+        },
+      }
+    );
+  }
+
+  function buildReadinessDonut(bands) {
+    destroyChart('readiness');
+    const c = chartColors();
+    window._charts.readiness = new Chart(
+      document.getElementById('chartReadiness').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: ['High (≥80%)', 'Medium (50–79%)', 'Low (<50%)'],
+          datasets: [{
+            data: [bands.high, bands.medium, bands.low],
+            backgroundColor: ['rgba(0,161,156,0.8)','rgba(245,166,35,0.8)','rgba(229,115,115,0.8)'],
+            borderWidth: 2,
+            borderColor: isDark() ? '#161B22' : '#FFFFFF',
+          }],
+        },
+        options: {
+          cutout: '62%', responsive: true,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: c.text, font: { size: 11 }, padding: 14 } },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} employees` } },
+          },
+        },
+      }
+    );
+  }
+
+  function buildDeptChart(departments) {
+    destroyChart('dept');
+    const c     = chartColors();
+    const depts = Object.entries(departments).sort((a, b) => b[1].avg_readiness_pct - a[1].avg_readiness_pct);
+    window._charts.dept = new Chart(
+      document.getElementById('chartDeptReadiness').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: depts.map(([d]) => d),
+          datasets: [{
+            label: 'Avg Readiness %',
+            data:  depts.map(([, v]) => v.avg_readiness_pct),
+            backgroundColor: depts.map(([, v]) => readinessColor(v.avg_readiness_pct) + 'CC'),
+            borderRadius: 6, borderSkipped: false,
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { afterLabel: ctx => `${depts[ctx.dataIndex][1].employee_count} employees` } },
+          },
+          scales: {
+            y: { min: 0, max: 100, grid: { color: c.grid }, ticks: { color: c.text, font: { size: 11 }, callback: v => v + '%' } },
+            x: { grid: { display: false }, ticks: { color: c.text, font: { size: 11 } } },
+          },
+        },
+      }
+    );
+  }
+
+  function buildRoleChart(targetRoles) {
+    destroyChart('role');
+    const c     = chartColors();
+    const roles = Object.entries(targetRoles).sort((a, b) => b[1].avg_readiness_pct - a[1].avg_readiness_pct);
+    const shorten = s => s.length > 22 ? s.slice(0, 20) + '…' : s;
+    window._charts.role = new Chart(
+      document.getElementById('chartRoleReadiness').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: roles.map(([r]) => shorten(r)),
+          datasets: [{
+            label: 'Avg Readiness %',
+            data:  roles.map(([, v]) => v.avg_readiness_pct),
+            backgroundColor: roles.map(([, v]) => readinessColor(v.avg_readiness_pct) + 'CC'),
+            borderRadius: 6, borderSkipped: false,
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: {
+              title: items => roles[items[0].dataIndex][0],
+              afterLabel: ctx => `${roles[ctx.dataIndex][1].employee_count} employee(s) targeting this role`,
+            }},
+          },
+          scales: {
+            y: { min: 0, max: 100, grid: { color: c.grid }, ticks: { color: c.text, font: { size: 11 }, callback: v => v + '%' } },
+            x: { grid: { display: false }, ticks: { color: c.text, font: { size: 10 }, maxRotation: 30 } },
+          },
+        },
+      }
+    );
+  }
+
+  // ── DOM renderers ────────────────────────────────────────────────────────
+  function renderKPIs(summary) {
+    const set = (id, val, subId, sub) => {
+      const el = document.getElementById(id);
+      el.textContent = val;
+      el.classList.remove('skeleton');
+      el.style.minHeight = '';
+      el.style.minWidth  = '';
+      if (subId) document.getElementById(subId).textContent = sub;
+    };
+    set('kpiTotal',    summary.total_employees,       'kpiTotalSub',    'employees in workforce');
+    set('kpiReadiness', summary.avg_readiness_pct + '%', 'kpiReadinessSub', 'avg target role readiness');
+    set('kpiReady',    summary.fully_ready,            'kpiReadySub',    'meet all role requirements');
+    set('kpiGaps',     summary.total_gaps,             'kpiGapsSub',     'open skill gaps identified');
+    set('kpiAvgGaps',  summary.avg_gaps_per_employee,  null,             null);
+  }
+
+  function renderDeptTable(departments) {
+    document.getElementById('deptCount').textContent = Object.keys(departments).length + ' departments';
+    document.getElementById('deptTableBody').innerHTML = Object.entries(departments).map(([dept, data]) => {
+      const pct     = data.avg_readiness_pct;
+      const color   = readinessColor(pct);
+      const gapTags = data.top_gaps.slice(0, 3)
+        .map(g => `<span style="display:inline-block;font-size:10px;padding:2px 7px;background:var(--surface-3);border-radius:999px;margin:2px 2px 0;color:var(--text-2);">${g.skill} <strong style="color:var(--text-1);">(${g.avg_gap.toFixed(1)})</strong></span>`)
+        .join('');
+      return `<tr>
+        <td><strong>${dept}</strong></td>
+        <td>${data.employee_count}</td>
+        <td>
+          <div class="readiness-bar-wrap">
+            <div class="readiness-bar-bg"><div class="readiness-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+            <span class="readiness-val" style="color:${color};">${pct}%</span>
+          </div>
+        </td>
+        <td>${gapTags}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderTrainingList(alignment) {
+    const list = document.getElementById('trainingList');
+    if (!alignment.length) { list.innerHTML = '<div style="color:var(--text-3);font-size:13px;">No data available.</div>'; return; }
+    list.innerHTML = alignment.map((item, i) => `
+      <div class="training-item">
+        <div class="training-rank">${i + 1}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="training-title">${item.title}</div>
+          <div class="training-meta">${item.provider} &nbsp;·&nbsp; Helps ${item.employees_helped} employee(s) &nbsp;·&nbsp; Covers ${item.critical_skills_covered} critical skill(s)</div>
+          <div class="training-tags">${item.skills_covered.map(s => `<span class="training-tag">${s}</span>`).join('')}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  function renderEmpTable(employees) {
+    document.getElementById('empCount').textContent = employees.length + ' employees';
+    const sorted = [...employees].sort((a, b) => a.readiness_pct - b.readiness_pct);
+    document.getElementById('empTableBody').innerHTML = sorted.map(e => {
+      const cls   = readinessClass(e.readiness_pct);
+      const dcls  = deptBadgeClass(e.department);
+      const short = e.department.replace('Technical Services & Engineering', 'Technical').replace('Corporate & Business', 'Corporate');
+      return `<tr>
+        <td><strong>${e.name}</strong></td>
+        <td><span class="badge-dept ${dcls}">${short}</span></td>
+        <td style="text-align:center;">${e.gap_count}</td>
+        <td><span class="readiness-pill ${cls}">${e.readiness_pct}%</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── Render all sections from data ────────────────────────────────────────
+  function renderAll(data) {
+    renderKPIs(data.summary);
+    buildSkillGapsChart(data.skill_gaps);
+    buildReadinessDonut(data.summary.readiness_bands);
+    buildDeptChart(data.departments);
+    buildRoleChart(data.target_roles);
+    renderDeptTable(data.departments);
+    renderTrainingList(data.training_alignment);
+    renderEmpTable(data.employees);
+    updateCacheBadge(data._cached_at || null);
+  }
+
+  // ── Load analytics (served from cache) ──────────────────────────────────
+  async function loadAnalytics() {
+    setTopProgress(20);
+    try {
+      const res  = await fetch('/api/analytics/workforce');
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setTopProgress(100);
+      renderAll(data);
+    } catch (err) {
+      setTopProgress(0);
+      showToast('❌', 'Failed to load analytics: ' + err.message);
+      document.getElementById('cacheBadge').textContent = 'Load failed';
+    }
+  }
+
+  // ── Refresh button ───────────────────────────────────────────────────────
+  window.triggerRefresh = async function () {
+    const btn = document.getElementById('refreshBtn');
+    btn.disabled = true;
+    btn.classList.add('spinning');
+    document.getElementById('cacheBadge').textContent = 'Refreshing…';
+    setTopProgress(15);
+    showToast('🔄', 'Re-running analytics engine…');
+    try {
+      const res  = await fetch('/api/analytics/refresh', { method: 'POST' });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setTopProgress(100);
+      renderAll(data);
+      showToast('✅', 'Analytics refreshed with latest employee data.');
+    } catch (err) {
+      setTopProgress(0);
+      showToast('❌', 'Refresh failed: ' + err.message);
+      document.getElementById('cacheBadge').textContent = 'Refresh failed';
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('spinning');
+    }
+  };
+
+  // ── Fade-up observer ─────────────────────────────────────────────────────
+  document.querySelectorAll('.fade-up').forEach(el => {
+    el.style.opacity   = '0';
+    el.style.transform = 'translateY(20px)';
+  });
+  new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        e.target.style.opacity    = '1';
+        e.target.style.transform  = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.06 }).observe
+    ? (() => {
+        const obs = new IntersectionObserver((entries) => {
+          entries.forEach(e => {
+            if (e.isIntersecting) {
+              e.target.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+              e.target.style.opacity    = '1';
+              e.target.style.transform  = 'translateY(0)';
+              obs.unobserve(e.target);
+            }
+          });
+        }, { threshold: 0.06 });
+        document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+      })()
+    : null;
+
+  // ── Boot ─────────────────────────────────────────────────────────────────
+  checkHRAccess().then(allowed => {
+    if (allowed) loadAnalytics();
+  });
+
+}());
+</script>
+</body>
+</html>

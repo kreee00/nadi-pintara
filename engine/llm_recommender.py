@@ -1,79 +1,372 @@
-import requests
+"""
+llm_recommender.py
+Unified LLM interface for Nadi Pintara.
+
+Reads LLM_PROVIDER from .env and routes all calls to the correct backend.
+
+Supported providers
+───────────────────
+  gemini   — Google Gemini API
+               GEMINI_API_KEY  (or legacy AI_API_KEY)
+               GEMINI_MODEL    (default: gemini-2.5-flash)
+
+  openai   — OpenAI API or any OpenAI-compatible endpoint
+               OPENAI_API_KEY
+               OPENAI_MODEL    (default: gpt-4o-mini)
+               OPENAI_BASE_URL (optional — override for Groq, Together,
+                                Azure, Mistral, Perplexity, etc.)
+
+  ollama   — Local Ollama server (no API key needed)
+               OLLAMA_MODEL    (default: llama3.2:3b)
+               Ollama must be running on localhost:11434
+
+Usage:
+    from engine.llm_recommender import get_recommendations, generate_summary
+"""
+
+import os
 import json
 import re
+import time
+import requests
+from dotenv import load_dotenv
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "qwen2.5:latest"
+load_dotenv(override=True)
 
-def ask_qwen(prompt):
-    response = requests.post(
-        OLLAMA_URL,
-        json={
-            "model": MODEL,
-            "prompt": prompt,
-            "stream": False,
-            "options": {
-                "temperature": 0.3,   # Lower = more consistent JSON output
-                "top_p": 0.9
-            }
-        },
-        timeout=120  # Qwen can take up to 2 minutes on your hardware
+# ── Provider config ───────────────────────────────────────────────────────────
+
+PROVIDER = os.getenv("LLM_PROVIDER", "gemini").lower().strip()
+
+# Gemini
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_KEY   = os.getenv("GEMINI_API_KEY") or os.getenv("AI_API_KEY", "")
+
+# OpenAI / OpenAI-compatible
+OPENAI_MODEL    = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_KEY      = os.getenv("OPENAI_API_KEY", "")
+OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "").strip()  # leave blank for OpenAI default
+
+# Ollama
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+OLLAMA_URL   = "http://localhost:11434/api/generate"
+
+# Startup log
+if PROVIDER == "ollama":
+    print(f"[LLM] Provider: OLLAMA | Model: {OLLAMA_MODEL}")
+elif PROVIDER == "openai":
+    base_tag = f" | Base URL: {OPENAI_BASE_URL}" if OPENAI_BASE_URL else ""
+    print(f"[LLM] Provider: OPENAI | Model: {OPENAI_MODEL}{base_tag}")
+else:
+    print(f"[LLM] Provider: GEMINI | Model: {GEMINI_MODEL}")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  RAW API CALLS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _call_gemini(prompt, retries=3, delay=5):
+    """Send prompt to Google Gemini API. Returns raw text or None on failure."""
+    try:
+        from google import genai
+        from google.genai import types
+        client = genai.Client(api_key=GEMINI_KEY)
+    except Exception as e:
+        print(f"[Gemini] SDK init failed: {e}")
+        return None
+
+    for attempt in range(retries):
+        try:
+            response = client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    temperature=0.1,
+                    response_mime_type="application/json",
+                    max_output_tokens=1024
+                )
+            )
+            return response.text
+        except Exception as e:
+            err = str(e)
+            if "503" in err or "UNAVAILABLE" in err:
+                if attempt < retries - 1:
+                    print(f"[Gemini] Busy, retrying in {delay}s... "
+                          f"(attempt {attempt + 1}/{retries})")
+                    time.sleep(delay)
+                else:
+                    print("[Gemini] Still unavailable after retries.")
+                    return None
+            else:
+                print(f"[Gemini] Error: {err}")
+                return None
+
+
+def _call_openai(prompt, retries=3, delay=5):
+    """
+    Send prompt to an OpenAI-compatible API.
+    Works with OpenAI, Groq, Together, Azure OpenAI, Mistral, Perplexity, etc.
+    Set OPENAI_BASE_URL in .env to point to a different provider's endpoint.
+    """
+    try:
+        from openai import OpenAI
+    except ImportError:
+        print("[OpenAI] 'openai' package not installed. Run: pip install openai")
+        return None
+
+    kwargs = {"api_key": OPENAI_KEY or "none"}
+    if OPENAI_BASE_URL:
+        kwargs["base_url"] = OPENAI_BASE_URL
+
+    client = OpenAI(**kwargs)
+
+    for attempt in range(retries):
+        try:
+            response = client.chat.completions.create(
+                model=OPENAI_MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                max_completion_tokens=1024,
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            err = str(e)
+            if any(k in err.lower() for k in ("503", "rate", "overload", "unavailable")):
+                if attempt < retries - 1:
+                    print(f"[OpenAI] Busy, retrying in {delay}s... "
+                          f"(attempt {attempt + 1}/{retries})")
+                    time.sleep(delay)
+                else:
+                    print("[OpenAI] Still unavailable after retries.")
+                    return None
+            else:
+                print(f"[OpenAI] Error: {err}")
+                return None
+
+
+def _call_ollama(prompt, retries=2):
+    """Send prompt to local Ollama server. Returns raw text or None on failure."""
+    for attempt in range(retries):
+        try:
+            response = requests.post(
+                OLLAMA_URL,
+                json={
+                    "model":  OLLAMA_MODEL,
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {
+                        "temperature":    0,
+                        "top_p":          0.1,
+                        "num_thread":     4,
+                        "num_ctx":        1024,
+                        "num_predict":    256,
+                        "repeat_penalty": 1.2,
+                        "use_mmap":       True,
+                    }
+                },
+                timeout=45
+            )
+            response.raise_for_status()
+            return response.json()["response"]
+        except requests.exceptions.ConnectionError:
+            print("[Ollama] Not running. Start with: ollama serve")
+            return None
+        except (requests.exceptions.Timeout,
+                requests.exceptions.RequestException) as e:
+            if attempt < retries - 1:
+                print(f"[Ollama] Attempt {attempt + 1} failed, retrying... ({e})")
+            else:
+                print(f"[Ollama] Failed after {retries} attempts.")
+                return None
+
+
+def _ask(prompt):
+    """Route prompt to the active provider. Returns raw text or None."""
+    if PROVIDER == "ollama":
+        return _call_ollama(prompt)
+    if PROVIDER == "openai":
+        return _call_openai(prompt)
+    return _call_gemini(prompt)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  SHARED PROMPT BUILDER
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _build_prompt(employee, skill_gaps, courses):
+    slim_courses = [
+        {"id": c["id"], "title": c["title"], "skills": c["skills_covered"]}
+        for c in courses
+    ]
+    top_3_gaps  = list(skill_gaps.items())[:3]
+    gap_strings = [
+        f"{s}: {d['current']}->{d['required']}"
+        for s, d in top_3_gaps
+    ]
+
+    # Flag zero-current skills so the LLM knows what's most urgent
+    zero_skills = [s for s, d in skill_gaps.items() if d["current"] == 0]
+    zero_note = (
+        f"\nCRITICAL: Employee has ZERO knowledge in: {', '.join(zero_skills)}. "
+        "Prioritise courses covering these skills first."
+        if zero_skills else ""
     )
-    return response.json()["response"]
 
-def parse_json_response(text):
-    # Strip markdown code fences if Qwen adds them
+    example = (
+        '\n\nExample Output:\n'
+        '{"recommended_path": [{"order": 1, "course_id": "C001", '
+        '"why_relevant": "Covers the gap."}], '
+        '"total_timeline": "3 months", "summary": "Focus on gaps."}'
+        if PROVIDER == "ollama" else ""
+    )
+
+    return (
+        f"Task: Pick 3 courses for this employee.\n"
+        f"Employee: {employee['current_role']} -> {employee['target_role']}\n"
+        f"Gaps: {', '.join(gap_strings)}"
+        f"{zero_note}\n\n"
+        f"Courses:\n{json.dumps(slim_courses)}"
+        f"{example}\n\n"
+        f"Output JSON:\n"
+        f'{{"recommended_path": [{{"order": 1, "course_id": "C001", '
+        f'"why_relevant": "One sentence reason."}}], '
+        f'"total_timeline": "...", "summary": "Two sentence summary."}}\n\n'
+        f"Respond ONLY in valid JSON. Use only course_id and why_relevant."
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  PARSE & HYDRATE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _parse(text):
+    """Strip markdown fences and parse JSON. Returns dict."""
+    if not text:
+        return {"error": "Empty response"}
     text = re.sub(r"```json|```", "", text).strip()
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        # Try to extract JSON object from the response
         match = re.search(r'\{.*\}', text, re.DOTALL)
         if match:
             try:
                 return json.loads(match.group())
-            except:
+            except Exception:
                 pass
-        return {"error": "Could not parse response", "raw": text}
+    return {"error": "Could not parse response", "raw": text}
+
+
+def _hydrate(parsed, courses):
+    """
+    Re-attach full course details to the slim LLM output.
+    The LLM returns only course_id + why_relevant to save tokens.
+    This function adds title, provider, url, duration, skills_addressed.
+    """
+    course_map = {c["id"]: c for c in courses}
+    hydrated   = []
+
+    for item in parsed.get("recommended_path", []):
+        cid    = item.get("course_id", "")
+        course = course_map.get(cid, {})
+        hydrated.append({
+            "order":            item.get("order", len(hydrated) + 1),
+            "course_id":        cid,
+            "course_title":     course.get("title",          "Unknown Course"),
+            "provider":         course.get("provider",       "—"),
+            "url":              course.get("url",             "#"),
+            "duration":         course.get("duration",        "—"),
+            "skills_addressed": course.get("skills_covered",  []),
+            "why_relevant":     item.get("why_relevant",      ""),
+        })
+
+    parsed["recommended_path"] = hydrated
+    return parsed
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  FALLBACK  (pure Python, no LLM)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _fallback(skill_gaps, courses):
+    print(f"[{PROVIDER.upper()}] Using rule-based fallback.")
+    gap_skills  = set(skill_gaps.keys())
+    zero_skills = {s for s, d in skill_gaps.items() if d["current"] == 0}
+
+    def score_course(c):
+        covered = set(c["skills_covered"]) & gap_skills
+        zero_hits = len(covered & zero_skills)
+        gap_weight = sum(skill_gaps[s]["gap"] for s in covered if s in skill_gaps)
+        return (zero_hits, gap_weight)
+
+    top_3 = sorted(courses, key=score_course, reverse=True)[:3]
+
+    return {
+        "recommended_path": [
+            {
+                "order":            i + 1,
+                "course_id":        c["id"],
+                "course_title":     c["title"],
+                "provider":         c["provider"],
+                "url":              c["url"],
+                "duration":         c["duration"],
+                "skills_addressed": list(set(c["skills_covered"]) & gap_skills),
+                "why_relevant":     "Recommended based on skill gap match (AI unavailable)",
+            }
+            for i, c in enumerate(top_3)
+        ],
+        "total_timeline": "Flexible",
+        "summary": (
+            "Courses selected automatically based on skill gap overlap. "
+            "AI engine was unavailable."
+        ),
+        "source": "fallback",
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  PUBLIC API
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def get_recommendations(employee, skill_gaps, courses):
-    prompt = f"""You are a corporate learning advisor. Your job is to recommend the best online courses for an employee based on their skill gaps.
+    """
+    Main entry point. Called by path_generator.py.
+    Returns a fully hydrated recommendation dict.
+    """
+    prompt = _build_prompt(employee, skill_gaps, courses)
+    raw    = _ask(prompt)
 
-EMPLOYEE:
-Name: {employee['name']}
-Current Role: {employee['current_role']}
-Target Role: {employee['target_role']}
-Years of Experience: {employee['years_experience']}
+    if raw is None:
+        return _fallback(skill_gaps, courses)
 
-SKILL GAPS (skill: current level → required level, scale 1-5):
-{json.dumps(skill_gaps, indent=2)}
+    parsed = _parse(raw)
 
-AVAILABLE COURSES:
-{json.dumps(courses, indent=2)}
+    if "error" in parsed:
+        return _fallback(skill_gaps, courses)
 
-INSTRUCTIONS:
-- Select only the most relevant 3 to 5 courses from the list above
-- Prioritise courses that address the biggest skill gaps first
-- Only recommend courses that exist in the list above
-- Respond ONLY with a valid JSON object, no explanation, no markdown
+    return _hydrate(parsed, courses)
 
-Use this exact JSON format:
-{{
-  "recommended_path": [
-    {{
-      "order": 1,
-      "course_id": "C001",
-      "course_title": "Course title here",
-      "provider": "Provider here",
-      "url": "URL here",
-      "duration": "Duration here",
-      "skills_addressed": ["Skill1", "Skill2"],
-      "why_relevant": "One sentence explanation specific to this employee"
-    }}
-  ],
-  "total_timeline": "Estimated total duration e.g. 4-5 months",
-  "summary": "Two sentence personalised summary for the employee"
-}}"""
 
-    raw_response = ask_qwen(prompt)
-    return parse_json_response(raw_response)
+def generate_summary(employee_name, current_role, target_role, assessed_skills):
+    """
+    Single LLM call to produce a 2-sentence career development summary.
+    Called by chatbot_engine.py after skill assessment is complete.
+    Returns a string, or None if the LLM is unavailable.
+    """
+    skills_str = ", ".join(f"{k}: {v}/5" for k, v in assessed_skills.items())
+    prompt = (
+        f"Write a 2-sentence career development summary for {employee_name} "
+        f"({current_role} → {target_role}). "
+        f"Assessed skill levels: {skills_str}. "
+        "Be encouraging and specific. No bullet points."
+    )
+    raw = _ask(prompt)
+    if not raw:
+        return None
+
+    raw = re.sub(r"```json|```", "", raw).strip()
+    try:
+        obj = json.loads(raw)
+        if isinstance(obj, dict):
+            return obj.get("summary", raw)
+    except Exception:
+        pass
+    return raw.strip()

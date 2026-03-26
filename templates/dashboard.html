@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nadi Pintara — My Dashboard</title>
+  <script>(function(){var t=localStorage.getItem('np-theme');var d=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(t===null&&d))document.documentElement.classList.add('dark');}());</script>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+
+<!-- Top progress bar -->
+<div id="top-progress"></div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- ═══ NAVBAR ═══════════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-brand-icon">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2C9 2 4 5.5 4 10C4 12.76 6.24 15 9 15C11.76 15 14 12.76 14 10C14 5.5 9 2 9 2Z" fill="white" opacity="0.9"/>
+        <circle cx="9" cy="10" r="2.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="nav-brand-text">
+      <span>nadi</span><span>pintara</span>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a href="/dashboard"    class="nav-link active">My Dashboard</a>
+    <a href="/courses-page" class="nav-link">Course Catalogue</a>
+    <a href="/hr-dashboard" class="nav-link" id="hrNavLink" style="display:none;">HR Analytics</a>
+  </div>
+
+  <div class="nav-right">
+    <button class="dark-toggle" id="darkToggle" title="Toggle dark mode">
+      <span class="dark-toggle-icon sun">☀</span>
+      <span class="dark-toggle-icon moon">☽</span>
+    </button>
+    <span class="nav-name" id="navName">—</span>
+    <div class="nav-avatar" id="navAvatar">—</div>
+    <a href="/login" onclick="localStorage.removeItem('nadipintara_employee_id')"
+       style="font-size:12px; color:var(--text-3); text-decoration:none; margin-left:4px;"
+       title="Switch user">↩</a>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ══════════════════════════════════════════════ -->
+<main class="page-wrapper">
+
+  <!-- HERO -->
+  <section class="hero fade-up">
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-greeting" id="heroGreeting">Welcome back.</div>
+          <div class="hero-sub">Here is your personalised career development summary.</div>
+          <div class="hero-meta" id="heroMeta">Last analysed: —</div>
+          <button class="btn-update-profile" onclick="openDrawer()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M9.5 2L12 4.5M1 13L2 10L10.5 1.5L12.5 3.5L4 12L1 13Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Update My Profile
+          </button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-label">Skill Gaps</div>
+            <div class="hero-stat-value teal" id="statGaps">—</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">Courses</div>
+            <div class="hero-stat-value gold" id="statCourses">—</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">Timeline</div>
+            <div class="hero-stat-value" id="statTimeline" style="color:white; font-size:15px;">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+
+    <!-- ROLE PROGRESSION -->
+    <div class="role-card fade-up" id="roleCard" style="display:none;">
+      <div class="role-badge current">
+        <div class="role-badge-label">Current Role</div>
+        <div class="role-badge-name" id="currentRoleName">—</div>
+        <div class="role-badge-dept" id="currentRoleDept">—</div>
+      </div>
+      <div class="role-arrow">
+        <div class="role-arrow-line">
+          <div class="role-arrow-dot"></div>
+          <span>→</span>
+          <div class="role-arrow-dot"></div>
+        </div>
+        <div class="role-arrow-label">AI Pathway Active</div>
+      </div>
+      <div class="role-badge target">
+        <div class="role-badge-label">Target Role</div>
+        <div class="role-badge-name" id="targetRoleName">—</div>
+        <div class="role-badge-dept">Career Goal</div>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE (before first analysis) -->
+    <div id="emptyState" style="text-align:center; padding:80px 24px;">
+      <div style="font-size:48px; margin-bottom:16px;">🛢️</div>
+      <div style="font-size:20px; font-weight:700; color:var(--text-1); margin-bottom:8px;">No analysis yet</div>
+      <div style="font-size:14px; color:var(--text-3); margin-bottom:24px;">Update your profile to get your personalised AI-powered learning path.</div>
+      <button class="btn btn-primary" onclick="openDrawer()">Get Started →</button>
+    </div>
+
+    <!-- DASHBOARD GRID (shown after analysis) -->
+    <div class="dashboard-grid fade-up" id="dashGrid" style="display:none;">
+
+      <!-- LEFT: Radar + Gap Bars -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Skill Gap Analysis</div>
+            <div class="card-sub">Current proficiency vs. target requirements</div>
+          </div>
+        </div>
+        <div class="radar-wrap">
+          <canvas id="radarCanvas" width="320" height="320"></canvas>
+          <div class="radar-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(0,161,156,0.7)"></div>
+              Current Skills
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(0,48,135,0.5); border:2px dashed var(--navy)"></div>
+              Required
+            </div>
+          </div>
+        </div>
+        <div class="gap-list" id="gapList"></div>
+      </div>
+
+      <!-- RIGHT: AI Learning Path (position:relative set via CSS .dashboard-grid .card:last-child) -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">AI-Recommended Learning Path</div>
+            <div class="card-sub">Personalised by Nadi Pintara Engine</div>
+          </div>
+          <div style="background:var(--teal-light); padding:4px 10px; border-radius:var(--radius-pill); font-size:11px; font-weight:700; color:var(--teal); white-space:nowrap;">
+            AI Generated
+          </div>
+        </div>
+        <div class="timeline" id="timeline"></div>
+        <div class="ai-summary-box" id="aiSummaryBox" style="display:none;">
+          <div class="ai-summary-label">AI Summary</div>
+          <div class="ai-summary-text" id="aiSummaryText"></div>
+          <div class="ai-summary-timeline" id="aiSummaryTimeline"></div>
+        </div>
+
+        <!-- Chatbot active overlay -->
+        <div id="aiCardOverlay" class="card-overlay" style="display:none;">
+          <div class="ai-blocked-msg">
+            💬 Chatbot session in progress<br>
+            <small>AI recommendations resume after assessment</small>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /dashboard-grid -->
+
+  </div><!-- /container -->
+</main>
+
+<!-- ═══ PROFILE DRAWER ════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">Update Your Profile</div>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+
+    <div class="drawer-body">
+
+      <!-- ── Profile form view ── -->
+      <div id="profileFormView">
+
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="inputName" placeholder="e.g. Ahmad Faizal bin Razak" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Current Role</label>
+          <div class="select-wrap">
+            <select class="form-select" id="inputCurrentRole" onchange="onRoleChange()">
+              <option value="">— Select your current role —</option>
+              <option>Petroleum Engineer (Junior)</option>
+              <option>Senior Petroleum Engineer</option>
+              <option>Drilling Engineer (Lead)</option>
+              <option>Subsea Engineer (Senior)</option>
+              <option>Refinery Process Engineer (Senior)</option>
+              <option>Plant Operations Engineer (Junior)</option>
+              <option>LNG Operations Specialist (Senior)</option>
+              <option>Technical Safety Engineer (Lead)</option>
+              <option>Pipeline Integrity Engineer (Senior)</option>
+              <option>Data Analyst (O&G focus)</option>
+              <option>Project Manager (O&G)</option>
+              <option>HSE Manager</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Role</label>
+          <div class="select-wrap">
+            <select class="form-select" id="inputTargetRole">
+              <option value="">— Select your target role —</option>
+              <option>Petroleum Engineer (Junior)</option>
+              <option>Senior Petroleum Engineer</option>
+              <option>Drilling Engineer (Lead)</option>
+              <option>Subsea Engineer (Senior)</option>
+              <option>Refinery Process Engineer (Senior)</option>
+              <option>Plant Operations Engineer (Junior)</option>
+              <option>LNG Operations Specialist (Senior)</option>
+              <option>Technical Safety Engineer (Lead)</option>
+              <option>Pipeline Integrity Engineer (Senior)</option>
+              <option>Data Analyst (O&G focus)</option>
+              <option>Project Manager (O&G)</option>
+              <option>HSE Manager</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Years of Experience</label>
+          <div class="stepper">
+            <button class="stepper-btn" onclick="stepYears(-1)">−</button>
+            <span class="stepper-val" id="yearsVal">3</span>
+            <button class="stepper-btn" onclick="stepYears(1)">+</button>
+          </div>
+        </div>
+
+        <div class="skills-section" id="skillsSection" style="display:none;">
+          <div class="skills-title">Current Skill Levels <span style="font-weight:400; color:var(--text-3); text-transform:none; letter-spacing:0; font-size:12px;">(1 = beginner · 5 = expert)</span></div>
+          <div id="skillSliders"></div>
+        </div>
+
+        <!-- Chatbot assessment trigger -->
+        <button class="btn-assess-chat" onclick="switchToChatbot()">
+          💬 Assess with AI Chat
+        </button>
+
+      </div><!-- /#profileFormView -->
+
+      <!-- ── Chatbot view ── -->
+      <div id="chatbotView" style="display:none;">
+
+        <div class="chatbot-header">
+          <button class="chatbot-back-btn" onclick="backFromChatbot()">← Back</button>
+          <div class="chatbot-progress" id="chatbotProgress">Ready to assess</div>
+        </div>
+
+        <div class="chatbot-messages" id="chatbotMessages"></div>
+
+        <div class="chatbot-input-row">
+          <input type="text" class="form-input" id="chatInput"
+            placeholder="Type your answer..."
+            onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendChatMessage(); }" />
+          <button class="btn btn-primary" id="chatSendBtn" onclick="sendChatMessage()">Send</button>
+        </div>
+
+      </div><!-- /#chatbotView -->
+
+    </div><!-- /.drawer-body -->
+
+    <div class="drawer-footer">
+      <button class="btn btn-primary btn-full btn-lg" id="analyseBtn" onclick="handleFooterBtn()">
+        Analyse My Profile
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCRIPTS ═══════════════════════════════════════════ -->
+<script src="/static/js/main.js"></script>
+<script>
+
+/* ── Role → Skills map ───────────────────────────────────── */
+const ROLE_SKILLS = {
+  "Petroleum Engineer (Junior)": ["Reservoir Engineering","Drilling Engineering","Production Optimization","Petroleum Geoscience","Python","Well Completion","Fluid Mechanics","Data Analytics"],
+  "Senior Petroleum Engineer":   ["Reservoir Engineering","Drilling Engineering","Production Optimization","Petroleum Geoscience","Python","Well Completion","Asset Integrity","Stakeholder Management"],
+  "Drilling Engineer (Lead)":    ["Drilling Engineering","Well Completion","Fluid Mechanics","Process Safety Management","HAZOP","HSSE Compliance","Contract Management","Project Management"],
+  "Subsea Engineer (Senior)":    ["Subsea Engineering","Pipeline Integrity","Fluid Mechanics","Asset Integrity","Risk Assessment","Project Management","HSSE Compliance","Regulatory Compliance"],
+  "Refinery Process Engineer (Senior)": ["Refinery Process Control","Plant Operations","Process Safety Management","HAZOP","Asset Integrity","Turnaround Management","Power BI","Risk Assessment"],
+  "Plant Operations Engineer (Junior)": ["Plant Operations","Refinery Process Control","Process Safety Management","HSSE Compliance","Fluid Mechanics","SAP ERP","Data Analytics","Risk Assessment"],
+  "LNG Operations Specialist (Senior)": ["LNG Operations","Plant Operations","Refinery Process Control","Process Safety Management","Asset Integrity","Regulatory Compliance","Stakeholder Management","Turnaround Management"],
+  "Technical Safety Engineer (Lead)":   ["Process Safety Management","HAZOP","Risk Assessment","HSSE Compliance","Regulatory Compliance","Stakeholder Management","Asset Integrity","Incident Investigation"],
+  "Pipeline Integrity Engineer (Senior)": ["Pipeline Integrity","Asset Integrity","Risk Assessment","HSSE Compliance","Regulatory Compliance","SAP ERP","Project Management","Fluid Mechanics"],
+  "Data Analyst (O&G focus)":    ["Data Analytics","Python","Power BI","Machine Learning","Project Management","Stakeholder Management","Refinery Process Control","Reservoir Engineering"],
+  "Project Manager (O&G)":       ["Project Management","Contract Management","Stakeholder Management","Risk Assessment","SAP ERP","Regulatory Compliance","Turnaround Management"],
+  "HSE Manager":                 ["HSE Management","HSSE Compliance","Regulatory Compliance","Process Safety Management","Risk Assessment","Stakeholder Management","Crisis Management","Incident Investigation"]
+};
+
+/* ── App State ───────────────────────────────────────────── */
+const appState = {
+  chatbotActive: false,
+  aiRecsLoading: false,
+  pendingAIResults: null,
+  assessedSkills: {},
+  skillsToAssess: [],
+  currentSkillIndex: 0,
+  questionIndex: 0,
+  conversationHistory: [],
+  currentEmployee: null,   // { name, current_role, target_role, years_experience, current_skills }
+};
+
+/* ── Form helpers ────────────────────────────────────────── */
+let yearsValue = 3;
+
+function stepYears(d) {
+  yearsValue = Math.max(0, Math.min(40, yearsValue + d));
+  document.getElementById('yearsVal').textContent = yearsValue;
+}
+
+function onRoleChange() {
+  const role = document.getElementById('inputCurrentRole').value;
+  const section = document.getElementById('skillsSection');
+  const container = document.getElementById('skillSliders');
+  if (!role || !ROLE_SKILLS[role]) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  const skills = ROLE_SKILLS[role];
+  container.innerHTML = skills.map(skill => `
+    <div class="skill-slider-item">
+      <div class="skill-slider-meta">
+        <span class="skill-slider-name">${skill}</span>
+        <span class="skill-badge" id="badge_${skill.replace(/\W/g,'_')}">3</span>
+      </div>
+      <input type="range" min="1" max="5" value="3"
+        oninput="document.getElementById('badge_${skill.replace(/\W/g,'_')}').textContent=this.value"
+        data-skill="${skill}" />
+    </div>
+  `).join('');
+}
+
+function getSkillValues() {
+  const sliders = document.querySelectorAll('#skillSliders input[type="range"]');
+  const out = {};
+  sliders.forEach(s => { out[s.dataset.skill] = parseInt(s.value); });
+  return out;
+}
+
+/* ── Footer button handler ───────────────────────────────── */
+function handleFooterBtn() {
+  const btn = document.getElementById('analyseBtn');
+  if (btn.dataset.mode === 'save') {
+    applyAssessmentResults();
+  } else {
+    submitProfile();
+  }
+}
+
+/* ── Submit profile (form mode) ──────────────────────────── */
+async function submitProfile() {
+  const name        = document.getElementById('inputName').value.trim() || 'Employee';
+  const currentRole = document.getElementById('inputCurrentRole').value;
+  const targetRole  = document.getElementById('inputTargetRole').value;
+
+  if (!currentRole || !targetRole) {
+    showToast('⚠️', 'Please select both current and target roles.'); return;
+  }
+  if (currentRole === targetRole) {
+    showToast('⚠️', 'Current and target roles must be different.'); return;
+  }
+
+  const currentSkills = getSkillValues();
+  const payload = {
+    name, current_role: currentRole, target_role: targetRole,
+    years_experience: yearsValue, current_skills: currentSkills
+  };
+
+  const btn = document.getElementById('analyseBtn');
+  btn.innerHTML = '<div class="btn-spinner"></div> Analysing...';
+  btn.classList.add('btn-loading');
+
+  setTopProgress(30);
+  showToast('🤖', 'AI engine is analysing your profile...');
+  closeDrawer();
+  showSkeletons();
+
+  try {
+    const res = await fetch('/recommend/custom', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    setTopProgress(85);
+    const data = await res.json();
+    renderDashboard(name, payload, data);
+    setTopProgress(100);
+    showToast('✅', 'Your learning path is ready!');
+  } catch (err) {
+    setTopProgress(0);
+    showToast('❌', 'Could not reach the AI engine. Is Flask running?');
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('dashGrid').style.display   = 'none';
+  }
+
+  btn.innerHTML = 'Analyse My Profile';
+  btn.classList.remove('btn-loading');
+}
+
+/* ── Two-phase autoload ──────────────────────────────────── */
+async function autoLoadEmployee() {
+  const employeeId = localStorage.getItem('nadipintara_employee_id');
+  if (!employeeId) return;
+
+  showSkeletons();
+  setTopProgress(20);
+
+  // Phase 1 — fast gap data (no LLM)
+  try {
+    const gapRes = await fetch(`/employee/${employeeId}/gap`);
+    const gapData = await gapRes.json();
+
+    if (gapData.error && !gapData.employee) {
+      throw new Error(gapData.error);
+    }
+
+    setTopProgress(50);
+    renderPhase1(gapData);
+    showToast('👋', `Welcome back, ${gapData.employee.name.split(' ')[0]}!`);
+  } catch {
+    setTopProgress(0);
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('roleCard').style.display   = 'none';
+    document.getElementById('dashGrid').style.display   = 'none';
+    return;
+  }
+
+  // Phase 2 — AI recommendations (async, non-blocking)
+  appState.aiRecsLoading = true;
+  try {
+    const recRes  = await fetch(`/recommend/${employeeId}`);
+    const recData = await recRes.json();
+    appState.aiRecsLoading = false;
+    setTopProgress(100);
+
+    if (appState.chatbotActive) {
+      appState.pendingAIResults = recData;
+    } else {
+      renderPhase2(recData);
+    }
+  } catch {
+    appState.aiRecsLoading = false;
+    setTopProgress(0);
+    document.getElementById('timeline').innerHTML =
+      '<div style="padding:20px 24px;color:var(--text-3);font-size:13px;">AI recommendations unavailable.</div>';
+  }
+}
+
+/* ── Phase 1 render (instant) ────────────────────────────── */
+function renderPhase1(data) {
+  const emp  = data.employee;
+  const gaps = data.skill_gaps || {};
+
+  // Nav
+  const initials = emp.name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('navAvatar').textContent = initials;
+  document.getElementById('navName').textContent   = emp.name.split(' ')[0];
+  if (emp.is_hr) document.getElementById('hrNavLink').style.display = '';
+  document.getElementById('heroGreeting').textContent = `Welcome back, ${emp.name.split(' ')[0]}.`;
+  document.getElementById('heroMeta').textContent  = 'Last analysed: ' + new Date().toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'});
+
+  // Stats
+  document.getElementById('statGaps').textContent    = Object.keys(gaps).length + ' Gaps';
+  document.getElementById('statCourses').textContent = '—';
+  document.getElementById('statTimeline').textContent = '…';
+
+  // Role card
+  document.getElementById('currentRoleName').textContent = emp.current_role;
+  document.getElementById('targetRoleName').textContent  = emp.target_role;
+  document.getElementById('currentRoleDept').textContent = 'Current';
+  document.getElementById('roleCard').style.display = '';
+  document.getElementById('emptyState').style.display   = 'none';
+  document.getElementById('dashGrid').style.display     = '';
+
+  setTimeout(() => {
+    document.getElementById('roleCard').classList.add('visible');
+    document.getElementById('dashGrid').classList.add('visible');
+  }, 50);
+
+  // Radar + gap bars
+  drawRadar(emp.current_skills, emp.current_role, emp.target_role);
+  renderGapBars(gaps);
+  setTimeout(() => animateGapBars(gaps), 200);
+
+  // Pre-fill form with employee data
+  appState.currentEmployee = emp;
+  document.getElementById('inputName').value = emp.name || '';
+  yearsValue = emp.years_experience || 3;
+  document.getElementById('yearsVal').textContent = yearsValue;
+  if (emp.current_role) {
+    document.getElementById('inputCurrentRole').value = emp.current_role;
+    onRoleChange();
+    // Apply known skill levels to sliders
+    if (emp.current_skills) {
+      Object.entries(emp.current_skills).forEach(([skill, level]) => {
+        const key = skill.replace(/\W/g,'_');
+        const slider = document.querySelector(`#skillSliders input[data-skill="${skill}"]`);
+        const badge  = document.getElementById(`badge_${key}`);
+        if (slider) { slider.value = level; }
+        if (badge)  { badge.textContent = level; }
+      });
+    }
+  }
+  if (emp.target_role) {
+    document.getElementById('inputTargetRole').value = emp.target_role;
+  }
+
+  // AI card skeleton while Phase 2 loads
+  document.getElementById('timeline').innerHTML = [1,2,3].map(()=>`
+    <div class="timeline-item">
+      <div class="skeleton skeleton-circle" style="width:32px;height:32px;flex-shrink:0"></div>
+      <div style="flex:1;padding-top:4px;display:flex;flex-direction:column;gap:8px;">
+        <div class="skeleton skeleton-line" style="width:80%"></div>
+        <div class="skeleton skeleton-line" style="width:50%"></div>
+        <div class="skeleton skeleton-line" style="width:65%"></div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Phase 2 render (AI results) ─────────────────────────── */
+function renderPhase2(data) {
+  const path    = data.learning_path || {};
+  const courses = path.recommended_path || [];
+
+  document.getElementById('statCourses').textContent  = courses.length + ' Courses';
+  document.getElementById('statTimeline').textContent = path.total_timeline || '—';
+
+  renderTimeline(courses);
+
+  if (path.summary) {
+    document.getElementById('aiSummaryText').textContent     = path.summary;
+    document.getElementById('aiSummaryTimeline').textContent = '⏱ ' + (path.total_timeline || '');
+    document.getElementById('aiSummaryBox').style.display    = '';
+  }
+}
+
+/* ── Full re-render (from form submit) ───────────────────── */
+function renderDashboard(name, payload, data) {
+  const path    = data.learning_path || {};
+  const gaps    = data.skill_gaps    || {};
+  const courses = path.recommended_path || [];
+
+  const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('navAvatar').textContent = initials;
+  document.getElementById('navName').textContent   = name.split(' ')[0];
+  document.getElementById('heroGreeting').textContent = `Welcome back, ${name.split(' ')[0]}.`;
+  document.getElementById('heroMeta').textContent  = 'Last analysed: ' + new Date().toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'});
+
+  document.getElementById('statGaps').textContent    = Object.keys(gaps).length + ' Gaps';
+  document.getElementById('statCourses').textContent = courses.length + ' Courses';
+  document.getElementById('statTimeline').textContent = path.total_timeline || '—';
+
+  document.getElementById('currentRoleName').textContent = payload.current_role;
+  document.getElementById('targetRoleName').textContent  = payload.target_role;
+  document.getElementById('currentRoleDept').textContent = 'Current';
+  document.getElementById('roleCard').style.display = '';
+  document.getElementById('emptyState').style.display   = 'none';
+  document.getElementById('dashGrid').style.display     = '';
+
+  setTimeout(() => {
+    document.getElementById('roleCard').classList.add('visible');
+    document.getElementById('dashGrid').classList.add('visible');
+  }, 50);
+
+  drawRadar(payload.current_skills, payload.current_role, payload.target_role);
+  renderGapBars(gaps);
+  renderTimeline(courses);
+
+  if (path.summary) {
+    document.getElementById('aiSummaryText').textContent     = path.summary;
+    document.getElementById('aiSummaryTimeline').textContent = '⏱ ' + (path.total_timeline || '');
+    document.getElementById('aiSummaryBox').style.display    = '';
+  }
+
+  setTimeout(() => animateGapBars(gaps), 200);
+}
+
+/* ── Skeletons ───────────────────────────────────────────── */
+function showSkeletons() {
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('roleCard').style.display   = '';
+  document.getElementById('dashGrid').style.display   = '';
+
+  document.getElementById('currentRoleName').innerHTML = '<div class="skeleton skeleton-line" style="width:140px;height:16px;"></div>';
+  document.getElementById('targetRoleName').innerHTML  = '<div class="skeleton skeleton-line" style="width:140px;height:16px;"></div>';
+
+  document.getElementById('gapList').innerHTML = [1,2,3,4].map(()=>`
+    <div class="gap-item">
+      <div class="gap-meta">
+        <div class="skeleton skeleton-line" style="width:140px"></div>
+        <div class="skeleton skeleton-line" style="width:40px"></div>
+      </div>
+      <div class="gap-track"><div class="skeleton" style="height:6px;width:100%;border-radius:999px"></div></div>
+    </div>`).join('');
+
+  document.getElementById('timeline').innerHTML = [1,2,3].map(()=>`
+    <div class="timeline-item">
+      <div class="skeleton skeleton-circle" style="width:32px;height:32px;flex-shrink:0"></div>
+      <div style="flex:1;padding-top:4px;display:flex;flex-direction:column;gap:8px;">
+        <div class="skeleton skeleton-line" style="width:80%"></div>
+        <div class="skeleton skeleton-line" style="width:50%"></div>
+        <div class="skeleton skeleton-line" style="width:65%"></div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Radar chart ─────────────────────────────────────────── */
+function drawRadar(currentSkills, currentRole, targetRole) {
+  const canvas = document.getElementById('radarCanvas');
+  const ctx = canvas.getContext('2d');
+  const isDark = document.documentElement.classList.contains('dark');
+
+  const skills = ROLE_SKILLS[currentRole] ? ROLE_SKILLS[currentRole].slice(0,8) : Object.keys(currentSkills).slice(0,8);
+  const N = skills.length;
+  if (N < 3) return;
+
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2, R = Math.min(W,H)/2 - 48;
+  ctx.clearRect(0,0,W,H);
+
+  const angleStep = (2 * Math.PI) / N;
+  const startAngle = -Math.PI / 2;
+
+  const currValues = skills.map(s => (currentSkills[s] || 1) / 5);
+  let progress = 0;
+
+  const animate = () => {
+    progress = Math.min(progress + 0.04, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    ctx.clearRect(0,0,W,H);
+
+    // Grid
+    for (let level=1;level<=5;level++){
+      const r=(R*level)/5;
+      ctx.beginPath();ctx.strokeStyle=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';ctx.lineWidth=1;
+      for(let i=0;i<=N;i++){const a=startAngle+i*angleStep;const x=cx+r*Math.cos(a);const y=cy+r*Math.sin(a);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+      ctx.closePath();ctx.stroke();
+    }
+    for(let i=0;i<N;i++){const a=startAngle+i*angleStep;ctx.beginPath();ctx.strokeStyle=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.08)';ctx.lineWidth=1;ctx.moveTo(cx,cy);ctx.lineTo(cx+R*Math.cos(a),cy+R*Math.sin(a));ctx.stroke();}
+
+    // Required polygon
+    ctx.beginPath();ctx.fillStyle='rgba(0,48,135,0.10)';ctx.strokeStyle='rgba(0,48,135,0.4)';ctx.lineWidth=2;ctx.setLineDash([4,4]);
+    for(let i=0;i<N;i++){const a=startAngle+i*angleStep;const x=cx+R*Math.cos(a);const y=cy+R*Math.sin(a);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+    ctx.closePath();ctx.fill();ctx.stroke();ctx.setLineDash([]);
+
+    // Current polygon (animated)
+    ctx.beginPath();
+    ctx.fillStyle='rgba(0,161,156,0.25)';ctx.strokeStyle='rgba(0,161,156,0.9)';ctx.lineWidth=2.5;
+    for(let i=0;i<N;i++){
+      const a=startAngle+i*angleStep;const val=currValues[i]*ease;
+      const x=cx+R*val*Math.cos(a);const y=cy+R*val*Math.sin(a);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.closePath();ctx.fill();ctx.stroke();
+
+    // Dots
+    for(let i=0;i<N;i++){
+      const a=startAngle+i*angleStep;const val=currValues[i]*ease;
+      const x=cx+R*val*Math.cos(a);const y=cy+R*val*Math.sin(a);
+      ctx.beginPath();ctx.fillStyle='var(--teal)';ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+    }
+
+    // Labels
+    ctx.font='600 11px DM Sans, sans-serif';ctx.fillStyle=isDark?'rgba(240,244,248,0.8)':'rgba(13,17,23,0.7)';ctx.textAlign='center';ctx.textBaseline='middle';
+    for(let i=0;i<N;i++){
+      const a=startAngle+i*angleStep;const labelR=R+28;
+      const x=cx+labelR*Math.cos(a);const y=cy+labelR*Math.sin(a);
+      const label=skills[i].length>12?skills[i].substring(0,11)+'…':skills[i];
+      ctx.fillText(label,x,y);
+    }
+
+    if(progress<1) requestAnimationFrame(animate);
+  };
+  requestAnimationFrame(animate);
+}
+
+/* ── Gap bars ────────────────────────────────────────────── */
+function renderGapBars(gaps) {
+  const container = document.getElementById('gapList');
+  container.innerHTML = Object.entries(gaps).map(([skill, data]) => `
+    <div class="gap-item">
+      <div class="gap-meta">
+        <span class="gap-name">${skill}</span>
+        <span class="gap-levels">${data.current} → ${data.required}</span>
+      </div>
+      <div class="gap-track">
+        <div class="gap-fill" data-pct="${(data.current/data.required)*100}" style="width:0%"></div>
+      </div>
+    </div>`).join('');
+}
+
+function animateGapBars() {
+  document.querySelectorAll('.gap-fill').forEach(bar => { bar.style.width = bar.dataset.pct + '%'; });
+}
+
+/* ── Timeline ────────────────────────────────────────────── */
+function renderTimeline(courses) {
+  const container = document.getElementById('timeline');
+  if (!courses.length) {
+    container.innerHTML = '<div style="padding:20px 24px;color:var(--text-3);font-size:13px;">No courses recommended.</div>';
+    return;
+  }
+  container.innerHTML = courses.map(c => `
+    <div class="timeline-item">
+      <div class="timeline-num">${c.order}</div>
+      <div class="timeline-content">
+        <div class="timeline-title">${c.course_title}</div>
+        <div class="timeline-meta">${c.provider || ''} · ${c.duration || ''}</div>
+        <div class="timeline-skills">
+          ${(c.skills_addressed||[]).map(s=>`<span class="skill-pill">${s}</span>`).join('')}
+        </div>
+        <div class="timeline-reason">${c.why_relevant || ''}</div>
+        <a href="${c.url || '#'}" target="_blank" class="btn-enroll">
+          Enroll Now
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M2 8L8 2M8 2H4M8 2V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Drawer ──────────────────────────────────────────────── */
+function openDrawer()  { document.getElementById('modalOverlay').classList.add('open'); }
+function closeDrawer() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  // If chatbot was open but user closes drawer, go back to form mode without saving
+  if (appState.chatbotActive) {
+    _deactivateChatbot();
+  }
+}
+function handleOverlayClick(e) { if (e.target === document.getElementById('modalOverlay')) closeDrawer(); }
+
+/* ── Chatbot: switch views ───────────────────────────────── */
+function switchToChatbot() {
+  const currentRole = document.getElementById('inputCurrentRole').value;
+  if (!currentRole) {
+    showToast('⚠️', 'Please select your current role first.'); return;
+  }
+
+  // Initialise state
+  appState.chatbotActive = true;
+  appState.assessedSkills = {};
+  appState.skillsToAssess = [...(ROLE_SKILLS[currentRole] || [])];
+  appState.currentSkillIndex = 0;
+  appState.questionIndex = 0;
+  appState.conversationHistory = [];
+
+  // Show overlay on AI card
+  document.getElementById('aiCardOverlay').style.display = '';
+
+  // Flip views
+  document.getElementById('profileFormView').style.display = 'none';
+  document.getElementById('chatbotView').style.cssText = 'display:flex; flex-direction:column; gap:12px; flex:1; min-height:0;';
+  document.getElementById('chatbotMessages').innerHTML = '';
+
+  // Footer button
+  const btn = document.getElementById('analyseBtn');
+  btn.textContent = 'Assessing...';
+  btn.disabled = true;
+  btn.dataset.mode = '';
+
+  startNextSkill();
+}
+
+function backFromChatbot() {
+  _deactivateChatbot();
+  // Reset footer
+  const btn = document.getElementById('analyseBtn');
+  btn.textContent = 'Analyse My Profile';
+  btn.disabled = false;
+  btn.dataset.mode = '';
+}
+
+function _deactivateChatbot() {
+  appState.chatbotActive = false;
+  document.getElementById('aiCardOverlay').style.display = 'none';
+  document.getElementById('chatbotView').style.cssText = 'display:none;';
+  document.getElementById('profileFormView').style.display = '';
+
+  // If AI results came in while chatbot was running, render them now
+  if (appState.pendingAIResults) {
+    renderPhase2(appState.pendingAIResults);
+    appState.pendingAIResults = null;
+  }
+}
+
+/* ── Chatbot: skill progression ──────────────────────────── */
+function startNextSkill() {
+  if (appState.currentSkillIndex >= appState.skillsToAssess.length) {
+    finalizeAssessment(); return;
+  }
+  const skill = appState.skillsToAssess[appState.currentSkillIndex];
+  const pct   = Math.round((appState.currentSkillIndex / appState.skillsToAssess.length) * 100);
+  document.getElementById('chatbotProgress').textContent = `Assessing: ${skill} — ${pct}%`;
+  appState.questionIndex = 0;
+  appState.conversationHistory = [];
+  askNextQuestion(skill);
+}
+
+async function askNextQuestion(skill) {
+  try {
+    const res = await fetch('/chatbot/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        skill,
+        question_index: appState.questionIndex,
+        answer: null,
+        conversation_history: appState.conversationHistory,
+      })
+    });
+    const data = await res.json();
+    appendBotBubble(data.question || 'Could not load question.');
+    appState.questionIndex = data.question_index || 0;
+  } catch {
+    appendBotBubble('Sorry, I could not load the next question. Please try again.');
+  }
+}
+
+/* ── Chatbot: send answer ────────────────────────────────── */
+async function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const answer = input.value.trim();
+  if (!answer) return;
+
+  input.value = '';
+  appendUserBubble(answer);
+
+  const btn = document.getElementById('chatSendBtn');
+  btn.disabled = true;
+
+  const skill = appState.skillsToAssess[appState.currentSkillIndex];
+  try {
+    const res = await fetch('/chatbot/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        skill,
+        question_index: appState.questionIndex,
+        answer,
+        conversation_history: appState.conversationHistory,
+      })
+    });
+    const data = await res.json();
+    appState.conversationHistory = data.conversation_history || appState.conversationHistory;
+
+    if (data.is_complete) {
+      appState.assessedSkills[skill] = data.skill_level_assigned;
+      appendBotBubble(`Got it! I've assessed your ${skill} at Level ${data.skill_level_assigned}/5.`);
+      appState.currentSkillIndex++;
+      setTimeout(startNextSkill, 600);
+    } else {
+      appendBotBubble(data.question);
+      appState.questionIndex = data.question_index;
+    }
+  } catch {
+    appendBotBubble('Something went wrong. Please try again.');
+  }
+
+  btn.disabled = false;
+  input.focus();
+}
+
+/* ── Chatbot: finalize ───────────────────────────────────── */
+async function finalizeAssessment() {
+  const emp = appState.currentEmployee;
+  document.getElementById('chatbotProgress').textContent = 'Assessment complete!';
+
+  try {
+    const res = await fetch('/chatbot/summarize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        assessed_skills: appState.assessedSkills,
+        employee_name: emp ? emp.name : 'you',
+        current_role:  emp ? emp.current_role : '',
+        target_role:   emp ? emp.target_role  : '',
+      })
+    });
+    const data = await res.json();
+    const summary = data.summary || 'Assessment complete!';
+    appendSummaryBubble(summary);
+  } catch {
+    appendSummaryBubble('Assessment complete! Your skills have been recorded.');
+  }
+
+  // Enable save button
+  const btn = document.getElementById('analyseBtn');
+  btn.textContent = 'Save to Profile';
+  btn.disabled = false;
+  btn.dataset.mode = 'save';
+}
+
+/* ── Chatbot: apply results ──────────────────────────────── */
+async function applyAssessmentResults() {
+  // Merge assessed skills into sliders
+  Object.entries(appState.assessedSkills).forEach(([skill, level]) => {
+    const key    = skill.replace(/\W/g,'_');
+    const slider = document.querySelector(`#skillSliders input[data-skill="${skill}"]`);
+    const badge  = document.getElementById(`badge_${key}`);
+    if (slider) { slider.value = level; }
+    if (badge)  { badge.textContent = level; }
+  });
+
+  _deactivateChatbot();
+
+  // Reset footer
+  const btn = document.getElementById('analyseBtn');
+  btn.textContent = 'Analyse My Profile';
+  btn.disabled = false;
+  btn.dataset.mode = '';
+
+  // Trigger recommendation
+  const name        = document.getElementById('inputName').value.trim() || (appState.currentEmployee ? appState.currentEmployee.name : 'Employee');
+  const currentRole = document.getElementById('inputCurrentRole').value || (appState.currentEmployee ? appState.currentEmployee.current_role : '');
+  const targetRole  = document.getElementById('inputTargetRole').value  || (appState.currentEmployee ? appState.currentEmployee.target_role  : '');
+
+  if (!currentRole || !targetRole || currentRole === targetRole) {
+    showToast('✅', 'Skills saved. Update your roles and analyse.');
+    return;
+  }
+
+  const currentSkills = Object.keys(appState.assessedSkills).length
+    ? appState.assessedSkills
+    : getSkillValues();
+
+  const payload = { name, current_role: currentRole, target_role: targetRole,
+    years_experience: yearsValue, current_skills: currentSkills };
+
+  btn.innerHTML = '<div class="btn-spinner"></div> Analysing...';
+  btn.classList.add('btn-loading');
+  showToast('🤖', 'Applying assessment and generating recommendations...');
+  closeDrawer();
+  showSkeletons();
+
+  try {
+    const res = await fetch('/recommend/custom', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    renderDashboard(name, payload, data);
+    showToast('✅', 'Profile updated with your assessment!');
+  } catch {
+    showToast('❌', 'Could not generate recommendations. Is Flask running?');
+  }
+
+  btn.innerHTML = 'Analyse My Profile';
+  btn.classList.remove('btn-loading');
+}
+
+/* ── Chat bubble helpers ─────────────────────────────────── */
+function appendBotBubble(text) {
+  const msgs = document.getElementById('chatbotMessages');
+  const div  = document.createElement('div');
+  div.className = 'chat-bubble bot';
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendUserBubble(text) {
+  const msgs = document.getElementById('chatbotMessages');
+  const div  = document.createElement('div');
+  div.className = 'chat-bubble user';
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendSummaryBubble(text) {
+  const msgs = document.getElementById('chatbotMessages');
+  const div  = document.createElement('div');
+  div.className = 'chat-bubble summary';
+  div.innerHTML = `<strong>Assessment Summary</strong><br>${text}`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// Run on page load
+autoLoadEmployee();
+
+</script>
+</body>
+</html>

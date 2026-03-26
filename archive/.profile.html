@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | Nadi Pintara</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"><i class="fas fa-brain"></i> Nadi Pintara</div>
+        <div class="menu">
+            <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="analysis.html"><i class="fas fa-chart-radar"></i> Skill Analysis</a>
+            <a href="learn.html"><i class="fas fa-book-reader"></i> Learning Path</a>
+            <a href="profile.html" class="active"><i class="fas fa-user-circle"></i> Profile</a>
+            <a href="index.html" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="navbar">
+            <h2>User Profile</h2>
+        </div>
+
+        <div class="card" style="max-width: 600px;">
+            <div style="display: flex; align-items: center; gap: 30px; margin-bottom: 40px;">
+                <div class="user-avatar" id="avatarLarge" style="width: 100px; height: 100px; font-size: 40px;">?</div>
+                <div>
+                    <h2 id="fullName">Loading...</h2>
+                    <p id="currentTitle" style="color: #64748b; font-size: 18px;"></p>
+                </div>
+            </div>
+
+            <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                <div>
+                    <div class="stat-label">Employee ID</div>
+                    <div id="empId" style="font-weight: 600; margin-bottom: 20px;">-</div>
+
+                    <div class="stat-label">Target Career</div>
+                    <div id="targetCareer" style="font-weight: 600; margin-bottom: 20px;">-</div>
+                </div>
+                <div>
+                    <div class="stat-label">Experience</div>
+                    <div id="exp" style="font-weight: 600; margin-bottom: 20px;">-</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px;">Current Skills</h3>
+            <div id="skillsList" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;">
+                <!-- Skills badges will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const empId = localStorage.getItem('employeeId');
+
+        fetch(`/employee/${empId}`)
+            .then(res => res.json())
+            .then(emp => {
+                document.getElementById('fullName').innerText = emp.name;
+                document.getElementById('currentTitle').innerText = emp.current_role;
+                document.getElementById('avatarLarge').innerText = emp.name.charAt(0);
+                document.getElementById('empId').innerText = emp.id;
+                document.getElementById('targetCareer').innerText = emp.target_role;
+                document.getElementById('exp').innerText = emp.years_experience + " Years";
+
+                const skillsList = document.getElementById('skillsList');
+                Object.entries(emp.current_skills).forEach(([skill, level]) => {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge badge-mid';
+                    badge.innerText = `${skill}: ${level}`;
+                    skillsList.appendChild(badge);
+                });
+            });
+    </script>
+</body>
+</html>
