@@ -193,11 +193,6 @@ def _ask(prompt):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def _build_prompt(employee, skill_gaps, courses):
-    """
-    Lean prompt shared by all providers.
-    The LLM only needs to return course_id + why_relevant.
-    Full course details are re-attached by _hydrate() after the call.
-    """
     slim_courses = [
         {"id": c["id"], "title": c["title"], "skills": c["skills_covered"]}
         for c in courses
@@ -208,7 +203,14 @@ def _build_prompt(employee, skill_gaps, courses):
         for s, d in top_3_gaps
     ]
 
-    # Ollama small models benefit from a concrete few-shot example
+    # Flag zero-current skills so the LLM knows what's most urgent
+    zero_skills = [s for s, d in skill_gaps.items() if d["current"] == 0]
+    zero_note = (
+        f"\nCRITICAL: Employee has ZERO knowledge in: {', '.join(zero_skills)}. "
+        "Prioritise courses covering these skills first."
+        if zero_skills else ""
+    )
+
     example = (
         '\n\nExample Output:\n'
         '{"recommended_path": [{"order": 1, "course_id": "C001", '
@@ -220,7 +222,8 @@ def _build_prompt(employee, skill_gaps, courses):
     return (
         f"Task: Pick 3 courses for this employee.\n"
         f"Employee: {employee['current_role']} -> {employee['target_role']}\n"
-        f"Gaps: {', '.join(gap_strings)}\n\n"
+        f"Gaps: {', '.join(gap_strings)}"
+        f"{zero_note}\n\n"
         f"Courses:\n{json.dumps(slim_courses)}"
         f"{example}\n\n"
         f"Output JSON:\n"
@@ -284,18 +287,17 @@ def _hydrate(parsed, courses):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def _fallback(skill_gaps, courses):
-    """
-    Rule-based fallback when the LLM is unavailable.
-    Ranks courses by number of skill gaps they cover.
-    Returns the same JSON shape as the LLM would.
-    """
     print(f"[{PROVIDER.upper()}] Using rule-based fallback.")
-    gap_skills = set(skill_gaps.keys())
-    top_3      = sorted(
-        courses,
-        key=lambda c: len(set(c["skills_covered"]) & gap_skills),
-        reverse=True
-    )[:3]
+    gap_skills  = set(skill_gaps.keys())
+    zero_skills = {s for s, d in skill_gaps.items() if d["current"] == 0}
+
+    def score_course(c):
+        covered = set(c["skills_covered"]) & gap_skills
+        zero_hits = len(covered & zero_skills)
+        gap_weight = sum(skill_gaps[s]["gap"] for s in covered if s in skill_gaps)
+        return (zero_hits, gap_weight)
+
+    top_3 = sorted(courses, key=score_course, reverse=True)[:3]
 
     return {
         "recommended_path": [
